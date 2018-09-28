@@ -9,6 +9,22 @@ module TwentyQs where
 -- go
 
 import System.IO
+import Text.Read
+
+
+remove [] = []
+remove (h:t)
+   | t == [] = []
+   | head t == '\DEL' = tail t
+   | otherwise = (h:(remove t))
+
+removeAll [] = []
+removeAll list
+    | elem '\DEL' list = removeAll (remove list)
+    | otherwise = list
+
+
+fixdel iostr = removeAll (read ("\"" ++ iostr++"\"") :: String)
 
 data QATree = QLeaf String
             | QNode String QATree QATree
@@ -43,8 +59,8 @@ askabout (QLeaf ans) =
        then return (QLeaf ans)
        else do
           putStrLn("What were you thinking of?")
-          newAns <- getLine               --get new answer
-          putStrLn("you said: "++newAns)
+          newAns <-   getLine             --get new answer
+          putStrLn("you said: "++ (fixdel newAns))
           putStrLn("Give a question")
           newQ <- getLine               --get new question
           putStrLn("you said: "++newQ)
