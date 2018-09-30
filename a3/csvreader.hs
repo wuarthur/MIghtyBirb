@@ -1,3 +1,5 @@
+module Csvreader where
+
 splitsep :: (a -> Bool) -> [a] -> [[a]]
 
 splitsep _ [] = [[]]
