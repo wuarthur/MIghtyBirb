@@ -1,3 +1,5 @@
+module Csvreader where
+
 splitsep :: (a -> Bool) -> [a] -> [[a]]
 -- splitsep sep lst splits a list into a list of lists by sep
 splitsep _ [] = [[]]
