@@ -1,7 +1,8 @@
-
 .DS_Store
 .idea
 pods
 node_modules
 a3/test.hs
 .idea/vcs.xml
+snakey/.cabal-sandbox
+snakey/dist
