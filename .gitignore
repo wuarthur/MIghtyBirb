@@ -5,6 +5,7 @@ node_modules
 a3/test.hs
 .idea/vcs.xml
 snakey/.cabal-sandbox
+snakey/cabal.sandbox.config
 snakey/dist
 .cabal-sandbox/
 SNakey12/cabal.sandbox.config
