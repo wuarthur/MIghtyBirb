@@ -6,3 +6,5 @@ a3/test.hs
 .idea/vcs.xml
 snakey/.cabal-sandbox
 snakey/dist
+.cabal-sandbox/
+SNakey12/cabal.sandbox.config
