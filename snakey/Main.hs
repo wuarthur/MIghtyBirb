@@ -53,7 +53,7 @@ render game =
 --snake render and move
 realSnake = [(0,0), (20,0), (40,0), (60,0)]
 
-updateSnake :: Float -> Float -> [(Float, Float)] -> [(Float, Float)]
+--updateSnake :: Float -> Float -> [(Float, Float)] -> [(Float, Float)]
 updateSnake _ _ [] = []
 updateSnake x y (h:t)= (x,y):(updateSnake (fst h) (snd h) t)
 
@@ -66,6 +66,18 @@ moveSnake dir (h:t)
     where
       x = fst h
       y = snd h
+
+-- crawl _ _ _ _ (h:t) =[]
+-- crawl x y x1 y1 (h:t)= (x,y):(crawl (fst h) (snd h) x1 y1 t)
+--
+-- snakeCrawl dir amount (h:t)
+--     | dir == 'w' =  (x, y+amount):(updateSnake x y t)
+--     | dir == 's' =  (x, y-amount):(updateSnake x y t)
+--     | dir == 'a' =  (x-amount, y):(updateSnake x y t)
+--     | dir == 'd' =  (x+amount, y):(updateSnake x y t)
+--     where
+--       x = fst h
+--       y = snd h
 
 newSnake = moveSnake 'N' realSnake
 drawSnakeH  [] = []
@@ -113,7 +125,11 @@ handleKeys (EventKey (Char 'a') _ _ _) game
 handleKeys _ game = game
 
 update :: Float -> SnakeGame -> SnakeGame
-update second game = game
+update second game =
+    game { foodLoc = (foodLoc game)
+        , snakeLoc = (snakeCrawl 'a' 1 (snakeLoc game))         -- center of the screen
+        , snakeDir = (snakeDir game)
+     }
 
 drawing :: Picture
 drawing = render initialState
