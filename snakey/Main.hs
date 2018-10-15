@@ -4,17 +4,18 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import Graphics.Gloss.Data.ViewPort
 
+
 grid :: Float
 grid = 20
 
 width, height, offset, speed :: Int
-width = 20 * 50 --change the 20 to grid TODO
-height = 20 * 50
+width = 50
+height = 50
 offset = 100
 speed = 10  -- so we move 1 grid space per 1/speed seconds
 
 window :: Display
-window = InWindow "Snakey" (width, height) (offset, offset)
+window = InWindow "Snakey" (width * 20, height * 20) (offset, offset)
 
 background :: Color
 background = white
@@ -32,7 +33,7 @@ data SnakeGame = Game
 initialState :: SnakeGame
 initialState = Game
   { foodLoc = (-grid, grid*5)
-  , snakeLoc =  [(0,0), (20,0), (40,0), (60,0)]       -- center of the screen
+  , snakeLoc =  [(0,0)]       -- center of the screen
   , snakeDir = 'w'
   }
 
@@ -53,10 +54,8 @@ render game =
 
 
 --food
-genFood :: SnakeGame -> (Float, Float)
-genFood game
-  | head (snakeLoc game) == (foodLoc game) = (foodLoc game) --randomly generate food
-  | otherwise = (foodLoc game)
+moveFood :: SnakeGame -> (Float, Float)
+moveFood game = (0,0) --randomly generate food
 
 --snake render and move
 moveSnake dir (h:t)
@@ -83,11 +82,16 @@ handleKeys (EventKey (Char key) _ _ _) game
 handleKeys _ game = game
 
 update :: Float -> SnakeGame -> SnakeGame
-update second game =
-    game { foodLoc = (foodLoc game)
-        , snakeLoc = (moveSnake (snakeDir game) (snakeLoc game))         -- center of the screen
-        , snakeDir = (snakeDir game)
-     }
+update second game
+  --if snake eats food (snake head = food location)
+  | head (moveSnake (snakeDir game) (snakeLoc game)) == (foodLoc game) =
+    game { foodLoc = moveFood game --move food
+      , snakeLoc = (foodLoc game):(snakeLoc game) --add to snake
+    }
+  | otherwise =
+    game {
+      snakeLoc = (moveSnake (snakeDir game) (snakeLoc game))
+    }
 
 main :: IO ()
 main = play window background speed initialState render handleKeys update
