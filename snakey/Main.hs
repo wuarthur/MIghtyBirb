@@ -1,6 +1,8 @@
 module Main(main, SnakeGame, render, initialState) where
 
 import Graphics.Gloss
+import Graphics.Gloss.Interface.Pure.Game
+import Graphics.Gloss.Data.ViewPort
 
 grid, speed :: Float
 grid = 20
@@ -22,7 +24,7 @@ background = white
 -- Ddescribe the state of the game.
 data SnakeGame = Game
   { foodLoc :: (Float, Float)
-  , snakeLoc :: (Float, Float)
+  , snakeLoc :: [(Float, Float)]
   , snakeDir :: Char -- N S E W
   } deriving Show
 
@@ -31,7 +33,7 @@ data SnakeGame = Game
 initialState :: SnakeGame
 initialState = Game
   { foodLoc = (-grid, grid*5)
-  , snakeLoc = (0, 0)         -- center of the screen
+  , snakeLoc =  [(0,0), (20,0), (40,0), (60,0)]       -- center of the screen
   , snakeDir = 'N'
   }
 
@@ -44,8 +46,7 @@ render game =
     --  The pong ball.
     food = uncurry translate (foodLoc game) $ color foodColor $ circleSolid 10
     foodColor = red
-
-    snake = uncurry translate (snakeLoc game) $ rectangleSolid grid grid
+    snake = drawSnake (snakeLoc game)
 
 
 --snake render and move
@@ -57,24 +58,57 @@ updateSnake x y (h:t)= (x,y):(updateSnake (fst h) (snd h) t)
 
 --keep the state somewhere of the snake to make sure it cannot move backward
 moveSnake dir (h:t)
-    | dir == 'N' =  (x, y+grid):(updateSnake x y t)
-    | dir == 'S' =  (x, y-grid):(updateSnake x y t)
-    | dir == 'W' =  (x-grid, y):(updateSnake x y t)
-    | dir == 'E' =  (x+grid, y):(updateSnake x y t)
+    | dir == 'w' =  (x, y+grid):(updateSnake x y t)
+    | dir == 's' =  (x, y-grid):(updateSnake x y t)
+    | dir == 'a' =  (x-grid, y):(updateSnake x y t)
+    | dir == 'd' =  (x+grid, y):(updateSnake x y t)
     where
       x = fst h
       y = snd h
 
 newSnake = moveSnake 'N' realSnake
-drawSnake [] = []
-drawSnake (h:t) = (drawPart h):(drawSnake t)
+drawSnakeH  [] = []
+drawSnakeH  (h:t) = (drawPart h):(drawSnakeH t)
+--actually draws the snake
+drawSnake list = (pictures (drawSnakeH  list))
 drawPart (x,y) = translate x y (rectangleSolid grid grid)
 --snake render and move
 
+
+-- | Respond to key events.
+-- For an 's' keypress, reset the ball to the center.
+handleKeys (EventKey (Char 'w') _ _ _) game =
+   game { foodLoc = (foodLoc game)
+   , snakeLoc = (moveSnake 'w' (snakeLoc game))        -- center of the screen
+   , snakeDir = 'w'
+   }
+
+handleKeys (EventKey (Char 's') _ _ _) game =
+   game { foodLoc = (foodLoc game)
+   , snakeLoc = (moveSnake 's' (snakeLoc game))        -- center of the screen
+   , snakeDir = 's'
+   }
+
+handleKeys (EventKey (Char 'd') _ _ _) game =
+    game { foodLoc = (foodLoc game)
+    , snakeLoc = (moveSnake 'd' (snakeLoc game))        -- center of the screen
+    , snakeDir = 'd'
+}
+
+handleKeys (EventKey (Char 'a') _ _ _) game =
+    game { foodLoc = (foodLoc game)
+    , snakeLoc = (moveSnake 'a' (snakeLoc game))        -- center of the screen
+    , snakeDir = 'a'
+ }
+-- Do nothing for all other events.
+handleKeys _ game = game
+
+update :: Float -> SnakeGame -> SnakeGame
+update second game = game
 
 drawing :: Picture
 drawing = render initialState
 
 --(pictures (drawSnake realSnake))
 main :: IO ()
-main = display window background drawing
+main = play window background 60 initialState render handleKeys update
