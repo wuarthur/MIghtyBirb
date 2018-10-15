@@ -4,17 +4,14 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import Graphics.Gloss.Data.ViewPort
 
-grid, speed :: Float
+grid :: Float
 grid = 20
 
-speed = 1  -- so we move 1 grid space per speed seconds
-
-width, height, offset :: Int
+width, height, offset, speed :: Int
 width = 20 * 50 --change the 20 to grid TODO
 height = 20 * 50
 offset = 100
-
-
+speed = 10  -- so we move 1 grid space per 1/speed seconds
 
 window :: Display
 window = InWindow "Snakey" (width, height) (offset, offset)
@@ -22,20 +19,21 @@ window = InWindow "Snakey" (width, height) (offset, offset)
 background :: Color
 background = white
 
--- Ddescribe the state of the game.
+
+-- Describe the state of the game.
 data SnakeGame = Game
   { foodLoc :: (Float, Float)
   , snakeLoc :: [(Float, Float)]
-  , snakeDir :: Char -- N S E W
+  , snakeDir :: Char
   } deriving Show
 
 
--- | The starting state for the game of Pong.
+-- | The starting state for the game
 initialState :: SnakeGame
 initialState = Game
   { foodLoc = (-grid, grid*5)
   , snakeLoc =  [(0,0), (20,0), (40,0), (60,0)]       -- center of the screen
-  , snakeDir = 'N'
+  , snakeDir = 'w'
   }
 
 -- | Convert a game state into a picture.
@@ -44,15 +42,12 @@ render :: SnakeGame  -- ^ The game state to render.
 render game =
   pictures [food, snake]
   where
-    --  The pong ball.
     food = uncurry translate (foodLoc game) $ color foodColor $ circleSolid 10
     foodColor = red
     snake = drawSnake (snakeLoc game)
 
 
 --snake render and move
-realSnake = [(0,0), (20,0), (40,0), (60,0)]
-
 --updateSnake :: Float -> Float -> [(Float, Float)] -> [(Float, Float)]
 updateSnake _ _ [] = []
 updateSnake x y (h:t)= (x,y):(updateSnake (fst h) (snd h) t)
@@ -67,23 +62,10 @@ moveSnake dir (h:t)
       x = fst h
       y = snd h
 
--- crawl _ _ _ _ (h:t) =[]
--- crawl x y x1 y1 (h:t)= (x,y):(crawl (fst h) (snd h) x1 y1 t)
---
--- snakeCrawl dir amount (h:t)
---     | dir == 'w' =  (x, y+amount):(updateSnake x y t)
---     | dir == 's' =  (x, y-amount):(updateSnake x y t)
---     | dir == 'a' =  (x-amount, y):(updateSnake x y t)
---     | dir == 'd' =  (x+amount, y):(updateSnake x y t)
---     where
---       x = fst h
---       y = snd h
-
-newSnake = moveSnake 'N' realSnake
 drawSnakeH  [] = []
 drawSnakeH  (h:t) = (drawPart h):(drawSnakeH t)
 --actually draws the snake
-drawSnake list = (pictures (drawSnakeH  list))
+drawSnake list = (pictures (drawSnakeH list))
 drawPart (x,y) = translate x y (rectangleSolid grid grid)
 --snake render and move
 
@@ -127,13 +109,10 @@ handleKeys _ game = game
 update :: Float -> SnakeGame -> SnakeGame
 update second game =
     game { foodLoc = (foodLoc game)
-        , snakeLoc = (snakeCrawl 'a' 1 (snakeLoc game))         -- center of the screen
+        , snakeLoc = (moveSnake (snakeDir game) (snakeLoc game))         -- center of the screen
         , snakeDir = (snakeDir game)
      }
 
-drawing :: Picture
-drawing = render initialState
-
 --(pictures (drawSnake realSnake))
 main :: IO ()
-main = play window background 60 initialState render handleKeys update
+main = play window background speed initialState render handleKeys update
