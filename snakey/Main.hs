@@ -6,6 +6,7 @@ import Graphics.Gloss.Data.ViewPort
 
 grid, speed :: Float
 grid = 20
+
 speed = 1  -- so we move 1 grid space per speed seconds
 
 width, height, offset :: Int
@@ -77,25 +78,33 @@ drawPart (x,y) = translate x y (rectangleSolid grid grid)
 
 -- | Respond to key events.
 -- For an 's' keypress, reset the ball to the center.
-handleKeys (EventKey (Char 'w') _ _ _) game =
-   game { foodLoc = (foodLoc game)
+handleKeys (EventKey (Char 'w') _ _ _) game
+   |(snakeDir game) == 's' = game
+   |otherwise =
+    game { foodLoc = (foodLoc game)
    , snakeLoc = (moveSnake 'w' (snakeLoc game))        -- center of the screen
    , snakeDir = 'w'
    }
 
-handleKeys (EventKey (Char 's') _ _ _) game =
+handleKeys (EventKey (Char 's') _ _ _) game
+   |(snakeDir game) == 'w' = game
+   |otherwise =
    game { foodLoc = (foodLoc game)
    , snakeLoc = (moveSnake 's' (snakeLoc game))        -- center of the screen
    , snakeDir = 's'
    }
 
-handleKeys (EventKey (Char 'd') _ _ _) game =
+handleKeys (EventKey (Char 'd') _ _ _) game
+    |(snakeDir game) == 'a' = game
+    |otherwise =
     game { foodLoc = (foodLoc game)
     , snakeLoc = (moveSnake 'd' (snakeLoc game))        -- center of the screen
     , snakeDir = 'd'
 }
 
-handleKeys (EventKey (Char 'a') _ _ _) game =
+handleKeys (EventKey (Char 'a') _ _ _) game
+   |(snakeDir game) == 'd' = game
+   |otherwise =
     game { foodLoc = (foodLoc game)
     , snakeLoc = (moveSnake 'a' (snakeLoc game))        -- center of the screen
     , snakeDir = 'a'
