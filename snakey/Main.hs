@@ -49,19 +49,23 @@ render game =
 
 
 --snake render and move
---realSnake = [(0,0), (20,0), (40,0), (60,0)]
+realSnake = [(0,0), (20,0), (40,0), (60,0)]
+
 updateSnake :: Float -> Float -> [(Float, Float)] -> [(Float, Float)]
 updateSnake _ _ [] = []
-updateSnake x y (h:t)=
-     (x,y):(updateSnake (fst h) (snd h) t)
+updateSnake x y (h:t)= (x,y):(updateSnake (fst h) (snd h) t)
 
 --keep the state somewhere of the snake to make sure it cannot move backward
 moveSnake dir (h:t)
-    | dir == "UP" =  ((fst h), (snd h)+grid):(updateSnake (fst h) (snd h) t)
-    | dir == "DOWN" =  ((fst h), (snd h)-grid):(updateSnake (fst h) (snd h) t)
-    | dir == "LEFT" =  ((fst h)-grid, (snd h)):(updateSnake (fst h) (snd h) t)
-    | dir == "RIGHT" =  ((fst h)+grid, (snd h)):(updateSnake (fst h) (snd h) t)
-newslake = moveSnake "UP" realSnake
+    | dir == 'N' =  (x, y+grid):(updateSnake x y t)
+    | dir == 'S' =  (x, y-grid):(updateSnake x y t)
+    | dir == 'W' =  (x-grid, y):(updateSnake x y t)
+    | dir == 'E' =  (x+grid, y):(updateSnake x y t)
+    where
+      x = fst h
+      y = snd h
+
+newSnake = moveSnake 'N' realSnake
 drawSnake [] = []
 drawSnake (h:t) = (drawPart h):(drawSnake t)
 drawPart (x,y) = translate x y (rectangleSolid grid grid)
@@ -74,5 +78,3 @@ drawing = render initialState
 --(pictures (drawSnake realSnake))
 main :: IO ()
 main = display window background drawing
-
-
