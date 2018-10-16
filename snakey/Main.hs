@@ -9,8 +9,8 @@ import System.IO.Unsafe
 
 grid, width, height, offset, speed :: Int
 grid = 20
-width = 50
-height = 50
+width = 20
+height = 20
 offset = 100
 speed = 10  -- so we move 1 grid space per 1/speed seconds
 
