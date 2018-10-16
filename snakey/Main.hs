@@ -3,28 +3,37 @@ module Main(main, SnakeGame, render, initialState) where
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import Graphics.Gloss.Data.ViewPort
+import System.Random
+import System.IO.Unsafe
 
 
-grid :: Float
+grid, width, height, offset, speed :: Int
 grid = 20
-
-width, height, offset, speed :: Int
 width = 50
 height = 50
 offset = 100
 speed = 10  -- so we move 1 grid space per 1/speed seconds
 
 window :: Display
-window = InWindow "Snakey" (width * 20, height * 20) (offset, offset)
+window = InWindow "Snakey" (width * grid, height * grid) (offset, offset)
 
 background :: Color
 background = white
 
+--generate a list of food locations
+generateFood =
+  do
+    gx <- newStdGen
+    gy <- newStdGen
+    let xs = randomRs (-(div width 2)+1, (div width 2)-1) gx
+    let ys = randomRs (-(div height 2)+1, (div height 2)-1) gy
+    let lst = [ (x * grid, y * grid) | (x, y) <- (zip xs ys)]
+    return lst
 
 -- Describe the state of the game.
 data SnakeGame = Game
-  { foodLoc :: (Float, Float)
-  , snakeLoc :: [(Float, Float)]
+  { foodLoc :: [(Int, Int)]
+  , snakeLoc :: [(Int, Int)]
   , snakeDir :: Char
   } deriving Show
 
@@ -32,10 +41,13 @@ data SnakeGame = Game
 -- | The starting state for the game
 initialState :: SnakeGame
 initialState = Game
-  { foodLoc = (-grid, grid*5)
+  { foodLoc = unsafePerformIO generateFood -- convert from IO [(Int, Int)] to [(Int, Int)]
   , snakeLoc =  [(0,0)]       -- center of the screen
   , snakeDir = 'w'
   }
+
+-- return the rest of the food
+moveFood (h:t) = t
 
 -- | Convert a game state into a picture.
 render :: SnakeGame  -- ^ The game state to render.
@@ -43,19 +55,18 @@ render :: SnakeGame  -- ^ The game state to render.
 render game =
   pictures [food, snake]
   where
-    food = uncurry translate (foodLoc game) $ color foodColor $ circleSolid 10
+    food = uncurry translate loc $ color foodColor $ circleSolid 10
+    loc = (fromIntegral(fst (head (foodLoc game))), fromIntegral(snd (head (foodLoc game))))
     foodColor = red
-    snake = drawSnake (snakeLoc game)
-    drawSnakeH  [] = []
-    drawSnakeH  (h:t) = (drawPart h):(drawSnakeH t)
+    snake = drawSnake snakeLocToFloat
+    -- convert from Int to Float for gloss
+    snakeLocToFloat = [ (fromIntegral(x), fromIntegral(y)) | (x,y) <- snakeLoc game]
+    gridF = fromIntegral(grid)
     --actually draws the snake
     drawSnake list = (pictures (drawSnakeH list))
-    drawPart (x,y) = translate x y (rectangleSolid grid grid)
-
-
---food
-moveFood :: SnakeGame -> (Float, Float)
-moveFood game = (0,0) --randomly generate food
+    drawSnakeH  [] = []
+    drawSnakeH  (h:t) = (drawPart h):(drawSnakeH t)
+    drawPart (x,y) = translate x y (rectangleSolid gridF gridF)
 
 --snake render and move
 moveSnake dir (h:t)
@@ -66,7 +77,7 @@ moveSnake dir (h:t)
     where
       x = fst h
       y = snd h
-      --updateSnake :: Float -> Float -> [(Float, Float)] -> [(Float, Float)]
+      updateSnake :: Int -> Int -> [(Int, Int)] -> [(Int, Int)]
       updateSnake _ _ [] = []
       updateSnake x y (h:t)= (x,y):(updateSnake (fst h) (snd h) t)
 
@@ -84,14 +95,13 @@ handleKeys _ game = game
 update :: Float -> SnakeGame -> SnakeGame
 update second game
   --if snake eats food (snake head = food location)
-  | head (moveSnake (snakeDir game) (snakeLoc game)) == (foodLoc game) =
-    game { foodLoc = moveFood game --move food
-      , snakeLoc = (foodLoc game):(snakeLoc game) --add to snake
+  | head nextLoc == head (foodLoc game) =
+    game { foodLoc = moveFood (foodLoc game) --move food
+      , snakeLoc = (head nextLoc):(snakeLoc game) --add to snake
     }
-  | otherwise =
-    game {
-      snakeLoc = (moveSnake (snakeDir game) (snakeLoc game))
-    }
+  | otherwise = game { snakeLoc = nextLoc }
+  where
+    nextLoc = moveSnake (snakeDir game) (snakeLoc game)
 
 main :: IO ()
 main = play window background speed initialState render handleKeys update

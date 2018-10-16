@@ -57,7 +57,7 @@ executable snakey
   -- other-extensions:
 
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.11 && <4.12, gloss==1.13.*
+  build-depends:       base >=4.11 && <4.12, gloss==1.13.*, random==1.*
 
   -- Directories containing source files.
   -- hs-source-dirs:
