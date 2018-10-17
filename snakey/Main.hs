@@ -29,11 +29,12 @@ window = InWindow "Snakey" (width * grid, height * grid) (offset, offset)
 background :: Color
 background = white
 
-foodColor, sHeadColor, sColor, eColor :: Color
+foodColor, sHeadColor, sColor, eColor, wallColor :: Color
 foodColor  = red
 sHeadColor = blue
 sColor     = black
 eColor     = green
+wallColor  = (makeColor 0.5 0.5 0.5 1)
 
 --go to da place in a diff style
 horizontalCrawl dir (x,y) (x1,y1)
@@ -114,10 +115,12 @@ initialState = Game
 render :: SnakeGame  -- ^ The game state to render.
        -> Picture   -- ^ A picture of this game state.
 render game =
-  pictures [food, snake, otherSnake]
+  pictures [food, snake, otherSnake, wallW, wallS, wallA, wallD]
   where
+    --food
     food = uncurry translate loc $ color foodColor $ circleSolid 10
     loc = (fromIntegral(fst (head (foodLoc game))), fromIntegral(snd (head (foodLoc game))))
+    --snake
     snake = drawSnake (snakeLocToFloat snakeLoc) False
     otherSnake = drawSnake (snakeLocToFloat evilSnake) True
     -- convert from Int to Float for gloss
@@ -132,6 +135,13 @@ render game =
         drawSnakeH (h:t) c = (drawPart h c):(drawSnakeH t c)
         --picture part
         drawPart (x,y) c   = color c $ translate x y (rectangleSolid gridF gridF)
+    --wall
+    wallW = color wallColor $ translate 0 (fromIntegral maxY) (rectangleSolid wallWidth gridF)
+    wallS = color wallColor $ translate 0 (fromIntegral minY) (rectangleSolid wallWidth gridF)
+    wallA = color wallColor $ translate (fromIntegral maxX) 0 (rectangleSolid gridF wallHeight)
+    wallD = color wallColor $ translate (fromIntegral minX) 0 (rectangleSolid gridF wallHeight)
+    wallWidth = fromIntegral(width * grid)
+    wallHeight = fromIntegral(height * grid)
 
 --snake render and move
 moveSnake dir (h:t)
