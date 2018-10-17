@@ -96,6 +96,7 @@ data SnakeGame = Game
   , roadToEvil :: Char --basically snakeDir but fo evil snake but only for debugging purposes
   , meat       :: Int -- decide whether enemy snake chases snake or food
   , steps      :: Int -- stall the enemy snake every
+  , menu       :: Bool --menu is open
   } deriving Show
 
 
@@ -109,6 +110,7 @@ initialState = Game
   , roadToEvil = 'w' --basically snakeDir but fo evil snake
   , meat       = 0 -- 0: chase food, 1: chase snake
   , steps      = 0
+  , menu       = True
   }
 
 -- | Convert a game state into a picture.
@@ -164,11 +166,19 @@ handleKeys (EventKey (Char key) _ _ _) game
   | key == 'a' && (snakeDir game) /= 'd' = game { snakeDir = key }
   | key == 'd' && (snakeDir game) /= 'a' = game { snakeDir = key }
   | otherwise = game
+handleKeys (EventKey (SpecialKey key) _ _ _) game
+  | key == KeyUp    && (snakeDir game) /= 's' = game { snakeDir = 'w' }
+  | key == KeyDown  && (snakeDir game) /= 'w' = game { snakeDir = 's' }
+  | key == KeyLeft  && (snakeDir game) /= 'd' = game { snakeDir = 'a' }
+  | key == KeyRight && (snakeDir game) /= 'a' = game { snakeDir = 'd' }
+  | key == KeySpace = game { menu = False }
+  | otherwise = game
 -- Do nothing for all other events.
 handleKeys _ game = game
 
 update :: Float -> SnakeGame -> SnakeGame
 update second game
+  | menu game = game --TODO make this display a menu
   --snake is out of bounds
   | touchBoundary (head (snakeLoc game)) == True =
      trace ("snake out of bound: " )
