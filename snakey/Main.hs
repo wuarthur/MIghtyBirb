@@ -39,34 +39,30 @@ wallColor  = (makeColor 0.5 0.5 0.5 1)
 elementOfMystery =
   do
     p <- newStdGen
-    let d  = randomRs (0, 1 :: Int) p
+    let d  = randomRs (0, 5 :: Int) p
     return d
 
 --go to da place in a diff style
 horizontalCrawl dir (x,y) (x1,y1)
-    | x > x1 && dir /= 'a' = 'a'
-    | x < x1 && dir /= 'd' = 'd'
-    | y > y1 && dir /= 's' = 's'
-    | y < y1 && dir /= 'w' = 'w'
-    | otherwise            = dir
+    | x > x1    = 'a'
+    | x < x1    = 'd'
+    | otherwise = verticalCrawl dir (x,y) (x1,y1)
 
 --go to da place
 verticalCrawl dir (x,y) (x1,y1)
-    | y > y1 && dir /= 's' = 's'
-    | y < y1 && dir /= 'w' = 'w'
-    | x > x1 && dir /= 'a' = 'a'
-    | x < x1 && dir /= 'd' = 'd'
-    | otherwise            = horizontalCrawl dir (x,y) (x1,y1)
+    | y > y1    = 's'
+    | y < y1    = 'w'
+    | otherwise = horizontalCrawl dir (x,y) (x1,y1)
 
 --enemy snake's ai
 evilWays dir myLoc meat foodLoc snake crawlType
     --go for the enemy snake
-    |meat == 0 = eat dir myLoc foodLoc
+    | meat == 0 = eat dir myLoc foodLoc
     --go for the food
-    |otherwise = eat dir myLoc (head snake)
+    | otherwise = eat dir myLoc (head snake)
     where
       eat dir me destination
-        | crawlType == 0 = dir
+        | crawlType == 0 = horizontalCrawl dir me destination
         | otherwise      = verticalCrawl dir me destination
 
 --check if snake touches itself
@@ -83,6 +79,13 @@ touchBoundary (x, y)
     | y < minY + 1 = trace ("input x: " ++ show y) True
     | y > maxY - 1 = trace ("input x: " ++ show y) True
     | otherwise    = trace ("input: " ++ show x ++ " ,  " ++ show y) False
+
+--check if snake touches enemy
+touchEnemy me enemy = touchE me
+touchE _ [] = False
+touchE me (h:t)
+  | me == h = True
+  | otherwise = touchE me t
 
 --generate a list of food locations
 generateFood =
@@ -196,47 +199,55 @@ update second game
   | (menu game) == 0 = game
   | (menu game) == 2 = game
   --snake is out of bounds
-  | touchBoundary (head (snakeLoc game)) == True =
-     trace ("snake out of bound: " )
-     game {
-      menu = 2
-     }
+  | touchBoundary (head (snakeLoc game)) =
+      trace ("snake out of bound")
+      game
+      { foodLoc = decapitate (foodLoc game)
+      , menu = 2
+      }
   --snake touches itself
-  | touchySelf (snakeLoc game) ==True =
-      trace ("snake ate itself: " )
-      game {
-       menu = 2
+  | touchySelf (snakeLoc game) =
+      trace ("snake ate itself")
+      game
+      { foodLoc = decapitate (foodLoc game)
+      , menu = 2
+      }
+  | touchE (head (snakeLoc game)) (evilSnake game) =
+      trace ("snake crashed into enemy")
+      game
+      { foodLoc = decapitate (foodLoc game)
+      , menu = 2
       }
   --snake eats food
   | head nextLoc == head (foodLoc game) = game
-     { foodLoc      = decapitate (foodLoc game) --move food
-     , snakeLoc     = (head nextLoc):(snakeLoc game) --add to snake
-     , evilSnake    = pythonLoc
-     , roadToEvil   = pythonDir
-     , choiceOfEvil = decapitate (choiceOfEvil game)
-     , steps        = (steps game) + 1
-     }
+      { foodLoc      = decapitate (foodLoc game) --move food
+      , snakeLoc     = (head nextLoc):(snakeLoc game) --add to snake
+      , evilSnake    = pythonLoc
+      , roadToEvil   = pythonDir
+      , choiceOfEvil = decapitate (choiceOfEvil game)
+      , steps        = (steps game) + 1
+      }
   --enemy snake eats food
   | head pythonLoc == head (foodLoc game) = game
-     { foodLoc      = decapitate (foodLoc game)
-     , snakeLoc     = nextLoc
-     , evilSnake    = pythonLoc
-     , choiceOfEvil = decapitate (choiceOfEvil game)
-     , steps        = (steps game) + 1
-     }
+      { foodLoc      = decapitate (foodLoc game)
+      , snakeLoc     = nextLoc
+      , evilSnake    = pythonLoc
+      , choiceOfEvil = decapitate (choiceOfEvil game)
+      , steps        = (steps game) + 1
+      }
   --stall enemy snake to make the game easier
   | (steps game) > stall = game
-     { snakeLoc = nextLoc
-     , steps    = 0
-     }
+      { snakeLoc = nextLoc
+      , steps    = 0
+      }
   --nothing happens
   | otherwise = game
-    { snakeLoc     = nextLoc
-    , evilSnake    = pythonLoc
-    , roadToEvil   = pythonDir
-    , choiceOfEvil = decapitate (choiceOfEvil game)
-    , steps        = (steps game) + 1
-    }
+      { snakeLoc     = nextLoc
+      , evilSnake    = pythonLoc
+      , roadToEvil   = pythonDir
+      , choiceOfEvil = decapitate (choiceOfEvil game)
+      , steps        = (steps game) + 1
+      }
 
   where
     nextLoc   = moveSnake (snakeDir game) (snakeLoc game)
