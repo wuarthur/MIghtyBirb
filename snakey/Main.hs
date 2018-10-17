@@ -106,7 +106,7 @@ initialState = Game
   { foodLoc    = unsafePerformIO generateFood -- convert from IO [(Int, Int)] to [(Int, Int)]
   , snakeLoc   = [(0,0)]       -- center of the screen
   , snakeDir   = 'w'
-  , evilSnake  = [( (div width 3)*grid, (div height 3)*grid )]
+  , evilSnake  = [((div width 3)*grid, (div height 3)*grid), ((div width 3)*grid, (div height 3)*grid-20) , ((div width 3)*grid, (div height 3)*grid-40)]
   , roadToEvil = 'w' --basically snakeDir but fo evil snake
   , meat       = 0 -- 0: chase food, 1: chase snake
   , steps      = 0
@@ -227,4 +227,5 @@ update second game
     moveFood (h:t) = t
 
 main :: IO ()
-main = play window background speed initialState render handleKeys update
+main = do   wall <- loadBMP "snake.bmp"
+            play window background speed initialState render handleKeys update
