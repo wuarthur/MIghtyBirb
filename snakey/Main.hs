@@ -36,6 +36,12 @@ sColor     = black
 eColor     = green
 wallColor  = (makeColor 0.5 0.5 0.5 1)
 
+elementOfMystery =
+  do
+    p <- newStdGen
+    let d  = randomRs (0, 1 :: Int) p
+    return d
+
 --go to da place in a diff style
 horizontalCrawl dir (x,y) (x1,y1)
     | x > x1 && dir /= 'a' = 'a'
@@ -53,14 +59,15 @@ verticalCrawl dir (x,y) (x1,y1)
     | otherwise            = horizontalCrawl dir (x,y) (x1,y1)
 
 --enemy snake's ai
-evilWays dir myLoc meat foodLoc snake
-    |meat == 0 = vegetarian dir myLoc foodLoc
-    |otherwise = nomnom dir myLoc snake
+evilWays dir myLoc meat foodLoc snake crawlType
+    --go for the enemy snake
+    |meat == 0 = eat dir myLoc foodLoc
+    --go for the food
+    |otherwise = eat dir myLoc (head snake)
     where
-      --go for the enemy snake
-      nomnom dir myLoc snake       = verticalCrawl dir myLoc (head snake)
-      --go for the food
-      vegetarian dir (x,y) (x1,y1) = verticalCrawl dir (x,y) (x1,y1)
+      eat dir me destination
+        | crawlType == 0 = dir
+        | otherwise      = verticalCrawl dir me destination
 
 --check if snake touches itself
 touchySelf (h:t) = touchy h t
@@ -89,36 +96,43 @@ generateFood =
 
 -- Describe the state of the game.
 data SnakeGame = Game
-  { foodLoc    :: [(Int, Int)]
-  , snakeLoc   :: [(Int, Int)]
-  , snakeDir   :: Char
-  , evilSnake  :: [(Int, Int)]
-  , roadToEvil :: Char --basically snakeDir but fo evil snake but only for debugging purposes
-  , meat       :: Int -- decide whether enemy snake chases snake or food
-  , steps      :: Int -- stall the enemy snake every
-  , menu       :: Bool --menu is open
+  { foodLoc      :: [(Int, Int)]
+  , snakeLoc     :: [(Int, Int)]
+  , snakeDir     :: Char
+  , evilSnake    :: [(Int, Int)]
+  , roadToEvil   :: Char --basically snakeDir but fo evil snake but only for debugging purposes
+  , choiceOfEvil :: [Int] -- randomized choice of which way the snake will go
+  , meat         :: Int -- decide whether enemy snake chases snake or food
+  , steps        :: Int -- stall the enemy snake every
+  , menu         :: Int
   } deriving Show
 
 
 -- | The starting state for the game
 initialState :: SnakeGame
 initialState = Game
-  { foodLoc    = unsafePerformIO generateFood -- convert from IO [(Int, Int)] to [(Int, Int)]
-  , snakeLoc   = [(0,0)]       -- center of the screen
-  , snakeDir   = 'w'
-  , evilSnake  = [((div width 3)*grid, (div height 3)*grid), ((div width 3)*grid, (div height 3)*grid-20) , ((div width 3)*grid, (div height 3)*grid-40)]
-  , roadToEvil = 'w' --basically snakeDir but fo evil snake
-  , meat       = 0 -- 0: chase food, 1: chase snake
-  , steps      = 0
-  , menu       = True
+  { foodLoc      = unsafePerformIO generateFood -- convert from IO [(Int, Int)] to [(Int, Int)]
+  , snakeLoc     = [(0,0)]       -- center of the screen
+  , snakeDir     = 'w'
+  , evilSnake    = [((div width 3)*grid, (div height 3)*grid), ((div width 3)*grid, (div height 3)*grid-20) , ((div width 3)*grid, (div height 3)*grid-40)]
+  , roadToEvil   = 'w' --basically snakeDir but fo evil snake
+  , choiceOfEvil = unsafePerformIO elementOfMystery
+  , meat         = 0 -- 0: chase food, 1: chase snake
+  , steps        = 0
+  , menu         = 0 -- 0: start game, 1: play game, 2: game over
   }
 
 -- | Convert a game state into a picture.
 render :: SnakeGame  -- ^ The game state to render.
        -> Picture   -- ^ A picture of this game state.
-render game =
-  pictures [food, snake, otherSnake, wallW, wallS, wallA, wallD]
+render game
+  | (menu game) == 0 = pictures [startScreen, wallW, wallS, wallA, wallD]
+  | (menu game) == 2 = pictures [deadScreen, wallW, wallS, wallA, wallD]
+  | otherwise = pictures [food, snake, otherSnake, wallW, wallS, wallA, wallD]
   where
+    --text
+    deadScreen = text "dead"
+    startScreen = text "press space to start"
     --food
     food = uncurry translate loc $ color foodColor $ circleSolid 10
     loc = (fromIntegral(fst (head (foodLoc game))), fromIntegral(snd (head (foodLoc game))))
@@ -171,40 +185,44 @@ handleKeys (EventKey (SpecialKey key) _ _ _) game
   | key == KeyDown  && (snakeDir game) /= 'w' = game { snakeDir = 's' }
   | key == KeyLeft  && (snakeDir game) /= 'd' = game { snakeDir = 'a' }
   | key == KeyRight && (snakeDir game) /= 'a' = game { snakeDir = 'd' }
-  | key == KeySpace = game { menu = False }
+  | key == KeySpace && (menu game) == 0 = initialState { menu = 1 } -- start game
+  | key == KeyEnter && (menu game) == 2 = game { menu = 0 } -- go to init screen
   | otherwise = game
 -- Do nothing for all other events.
 handleKeys _ game = game
 
 update :: Float -> SnakeGame -> SnakeGame
 update second game
---  | menu game = game --TODO make this display a menu
+  | (menu game) == 0 = game
+  | (menu game) == 2 = game
   --snake is out of bounds
   | touchBoundary (head (snakeLoc game)) == True =
      trace ("snake out of bound: " )
-     game
-      { snakeLoc = [] ----todo make end scene, rn it jsut dissapepars
-      }
+     game {
+      menu = 2
+     }
   --snake touches itself
   | touchySelf (snakeLoc game) ==True =
       trace ("snake ate itself: " )
-      game
-       { snakeLoc = [] ----todo make end scene, rn it jsut dissapepars
-       }
+      game {
+       menu = 2
+      }
   --snake eats food
   | head nextLoc == head (foodLoc game) = game
-     { foodLoc    = moveFood (foodLoc game) --move food
-     , snakeLoc   = (head nextLoc):(snakeLoc game) --add to snake
-     , evilSnake  = pythonLoc
-     , roadToEvil = pythonDir
-     , steps      = (steps game) + 1
+     { foodLoc      = decapitate (foodLoc game) --move food
+     , snakeLoc     = (head nextLoc):(snakeLoc game) --add to snake
+     , evilSnake    = pythonLoc
+     , roadToEvil   = pythonDir
+     , choiceOfEvil = decapitate (choiceOfEvil game)
+     , steps        = (steps game) + 1
      }
   --enemy snake eats food
   | head pythonLoc == head (foodLoc game) = game
-     { foodLoc   = moveFood (foodLoc game)
-     , snakeLoc  = nextLoc
-     , evilSnake = pythonLoc
-     , steps     = (steps game) + 1
+     { foodLoc      = decapitate (foodLoc game)
+     , snakeLoc     = nextLoc
+     , evilSnake    = pythonLoc
+     , choiceOfEvil = decapitate (choiceOfEvil game)
+     , steps        = (steps game) + 1
      }
   --stall enemy snake to make the game easier
   | (steps game) > stall = game
@@ -213,18 +231,19 @@ update second game
      }
   --nothing happens
   | otherwise = game
-    { snakeLoc   = nextLoc
-    , evilSnake  = pythonLoc
-    , roadToEvil = pythonDir
-    , steps      = (steps game) + 1
+    { snakeLoc     = nextLoc
+    , evilSnake    = pythonLoc
+    , roadToEvil   = pythonDir
+    , choiceOfEvil = decapitate (choiceOfEvil game)
+    , steps        = (steps game) + 1
     }
 
   where
     nextLoc   = moveSnake (snakeDir game) (snakeLoc game)
-    pythonDir = (evilWays (roadToEvil game)(head (evilSnake game))(meat game) (head(foodLoc game)) (snakeLoc game)) --todo update this
+    pythonDir = evilWays (roadToEvil game)(head (evilSnake game))(meat game) (head(foodLoc game)) (snakeLoc game) (head (choiceOfEvil game))
     pythonLoc = moveSnake pythonDir (evilSnake game)
-    -- return the rest of the food
-    moveFood (h:t) = t
+    -- return the rest of the list
+    decapitate (h:t) = t
 
 main :: IO ()
 main = do   wall <- loadBMP "snake.bmp"
