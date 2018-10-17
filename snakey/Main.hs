@@ -10,7 +10,7 @@ import Debug.Trace
 
 grid, width, height, offset, speed, stall :: Int
 grid   = 20
-width  = 20
+width  = 50
 height = 20
 offset = 100
 speed  = 5  -- so we move 1 grid space per 1/speed seconds
@@ -67,25 +67,17 @@ evilWays dir myLoc meat foodLoc snake crawlType
 
 --check if snake touches itself
 touchySelf (h:t) = touchy h t
-touchy head [] = False
-touchy head (h:t)
-    | head == h = True
-    | otherwise = touchy head t
+--check if snake touches enemy
+touchEnemy me enemy = touchy me enemy
+touchy myHead [] = False
+touchy myHead (h:t)
+    | myHead == h = True
+    | otherwise = touchy myHead t
 
 --check if snake goes out of bounds
 touchBoundary (x, y)
-    | x < minX + 1 = trace ("input x: " ++ show x) True
-    | x > maxX - 1 = trace ("input x: " ++ show x) True
-    | y < minY + 1 = trace ("input x: " ++ show y) True
-    | y > maxY - 1 = trace ("input x: " ++ show y) True
-    | otherwise    = trace ("input: " ++ show x ++ " ,  " ++ show y) False
-
---check if snake touches enemy
-touchEnemy me enemy = touchE me
-touchE _ [] = False
-touchE me (h:t)
-  | me == h = True
-  | otherwise = touchE me t
+    | x < minX + 1 || x > maxX - 1 || y < minY + 1 || y > maxY - 1 = True
+    | otherwise    = False
 
 --generate a list of food locations
 generateFood =
@@ -190,34 +182,25 @@ handleKeys (EventKey (SpecialKey key) _ _ _) game
   | key == KeyRight && (snakeDir game) /= 'a' = game { snakeDir = 'd' }
   | key == KeySpace && (menu game) == 0 = initialState { menu = 1 } -- start game
   | key == KeyEnter && (menu game) == 2 = game { menu = 0 } -- go to init screen
+  | key == KeyEsc = game { snakeLoc = [] } -- exit game
   | otherwise = game
 -- Do nothing for all other events.
 handleKeys _ game = game
 
 update :: Float -> SnakeGame -> SnakeGame
 update second game
-  | (menu game) == 0 = game
-  | (menu game) == 2 = game
+  | (menu game) == 0 || (menu game) == 2 = game
   --snake is out of bounds
   | touchBoundary (head (snakeLoc game)) =
       trace ("snake out of bound")
-      game
-      { foodLoc = decapitate (foodLoc game)
-      , menu = 2
-      }
+      gameOver
   --snake touches itself
   | touchySelf (snakeLoc game) =
       trace ("snake ate itself")
-      game
-      { foodLoc = decapitate (foodLoc game)
-      , menu = 2
-      }
-  | touchE (head (snakeLoc game)) (evilSnake game) =
+      gameOver
+  | touchEnemy (head (snakeLoc game)) (evilSnake game) =
       trace ("snake crashed into enemy")
-      game
-      { foodLoc = decapitate (foodLoc game)
-      , menu = 2
-      }
+      gameOver
   --snake eats food
   | head nextLoc == head (foodLoc game) = game
       { foodLoc      = decapitate (foodLoc game) --move food
@@ -253,6 +236,11 @@ update second game
     nextLoc   = moveSnake (snakeDir game) (snakeLoc game)
     pythonDir = evilWays (roadToEvil game)(head (evilSnake game))(meat game) (head(foodLoc game)) (snakeLoc game) (head (choiceOfEvil game))
     pythonLoc = moveSnake pythonDir (evilSnake game)
+    -- show game over screen
+    gameOver = game
+      { foodLoc = decapitate (foodLoc game)
+      , menu = 2
+      }
     -- return the rest of the list
     decapitate (h:t) = t
 
