@@ -126,7 +126,7 @@ render game
   | otherwise = pictures [food, snake, otherSnake, wallW, wallS, wallA, wallD]
   where
     --text
-    deadScreen = (text "dead")
+    deadScreen = unsafePerformIO (loadBMP "gameover.bmp") :: Picture
     --startScreen = translate -40 0 (text "press space to start")
     startScreen = unsafePerformIO (loadBMP "snake.bmp") :: Picture
     --food
