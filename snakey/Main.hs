@@ -126,8 +126,9 @@ render game
   | otherwise = pictures [food, snake, otherSnake, wallW, wallS, wallA, wallD]
   where
     --text
-    deadScreen = text "dead"
-    startScreen = text "press space to start"
+    deadScreen = (text "dead")
+    --startScreen = translate -40 0 (text "press space to start")
+    startScreen = unsafePerformIO (loadBMP "snake.bmp") :: Picture
     --food
     food = uncurry translate loc $ color foodColor $ circleSolid 10
     loc = (fromIntegral(fst (head (foodLoc game))), fromIntegral(snd (head (foodLoc game))))
