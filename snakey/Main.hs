@@ -178,7 +178,7 @@ handleKeys _ game = game
 
 update :: Float -> SnakeGame -> SnakeGame
 update second game
-  | menu game = game --TODO make this display a menu
+--  | menu game = game --TODO make this display a menu
   --snake is out of bounds
   | touchBoundary (head (snakeLoc game)) == True =
      trace ("snake out of bound: " )
