@@ -8,17 +8,18 @@ import System.IO.Unsafe
 import Debug.Trace
 
 
-grid, width, height, offset, speed :: Int
-grid = 20
-width = 20
+grid, width, height, offset, speed, stall :: Int
+grid   = 20
+width  = 20
 height = 20
 offset = 100
-speed = 3  -- so we move 1 grid space per 1/speed seconds
+speed  = 5  -- so we move 1 grid space per 1/speed seconds
+stall  = 1  -- steps enemy snake can take before it waits a tick
 
-maxY = (div (grid * height) 2)
-minY = -(div (grid * height) 2)
-maxX = (div (grid*width) 2)
-minX = - (div (grid*width) 2)
+maxY = grid * (div height 2)
+minY = grid * (-(div height 2))
+maxX = grid * (div width 2)
+minX = grid * (-(div width 2))
 
 
 
@@ -28,98 +29,86 @@ window = InWindow "Snakey" (width * grid, height * grid) (offset, offset)
 background :: Color
 background = white
 
+foodColor, sHeadColor, sColor, eColor :: Color
+foodColor  = red
+sHeadColor = blue
+sColor     = black
+eColor     = green
+
 --go to da place in a diff style
-frontCrawl dir (x,y) (x1,y1)
-    |x>x1 && dir/='a' ='a'
-    |x<x1 && dir/='d' ='d'
-    |y>y1 && dir/='s' ='s'
-    |y<y1 && dir/='w' ='w'
-    |otherwise = dir
+horizontalCrawl dir (x,y) (x1,y1)
+    | x > x1 && dir /= 'a' = 'a'
+    | x < x1 && dir /= 'd' = 'd'
+    | y > y1 && dir /= 's' = 's'
+    | y < y1 && dir /= 'w' = 'w'
+    | otherwise            = dir
 
 --go to da place
-backCrawl dir (x,y) (x1,y1)
-    |y>y1 && dir/='s' ='s'
-    |y<y1 && dir/='w' ='w'
-    |x>x1 && dir/='a' ='a'
-    |x<x1 && dir/='d' ='d'
-    |otherwise = frontCrawl dir (x,y) (x1,y1)
+verticalCrawl dir (x,y) (x1,y1)
+    | y > y1 && dir /= 's' = 's'
+    | y < y1 && dir /= 'w' = 'w'
+    | x > x1 && dir /= 'a' = 'a'
+    | x < x1 && dir /= 'd' = 'd'
+    | otherwise            = horizontalCrawl dir (x,y) (x1,y1)
 
-
-veggetarian dir (x,y) (x1,y1)
-    =backCrawl dir (x,y) (x1,y1)
-
--- calcDistance (x, y) (a,b)=  --bugg fix later if has energy
---     (abs (x-a)) + (abs (y-b))
---
---
--- getClosest xy snake=
---     getClosestH xy snake 999999
---
--- getClosestH xy [] n cord = cord
--- getClosestH xy (h:t) n cord
---     | new< n = getClosestH xy t new h
---     |otherwise = getClosestH xy t n cord
---     where
---     new = calcDistance xy h
-
-
-
-nomnom dir myLoc snake =
-    backCrawl dir myLoc (head snake)
-
+--enemy snake's ai
 evilWays dir myLoc meat foodLoc snake
-    |meat == 0 = veggetarian dir myLoc foodLoc
+    |meat == 0 = vegetarian dir myLoc foodLoc
     |otherwise = nomnom dir myLoc snake
+    where
+      --go for the enemy snake
+      nomnom dir myLoc snake       = verticalCrawl dir myLoc (head snake)
+      --go for the food
+      vegetarian dir (x,y) (x1,y1) = verticalCrawl dir (x,y) (x1,y1)
 
+--check if snake touches itself
 touchySelf (h:t) = touchy h t
 touchy head [] = False
 touchy head (h:t)
     | head == h = True
     | otherwise = touchy head t
 
+--check if snake goes out of bounds
 touchBoundary (x, y)
-    |x<minX = trace ("input x: " ++ show x)True
-    |x>maxX = trace ("input x: " ++ show x)True
-    |y<minY = trace ("input x: " ++ show y)True
-    |y>maxY = trace ("input x: " ++ show y)True
-    |otherwise = trace ("input: " ++ show x ++ " ,  " ++ show y) False
+    | x < minX + 1 = trace ("input x: " ++ show x) True
+    | x > maxX - 1 = trace ("input x: " ++ show x) True
+    | y < minY + 1 = trace ("input x: " ++ show y) True
+    | y > maxY - 1 = trace ("input x: " ++ show y) True
+    | otherwise    = trace ("input: " ++ show x ++ " ,  " ++ show y) False
 
 --generate a list of food locations
 generateFood =
   do
     gx <- newStdGen
     gy <- newStdGen
-    let xs = randomRs (-(div width 2)+1, (div width 2)-1) gx
-    let ys = randomRs (-(div height 2)+1, (div height 2)-1) gy
+    let xs  = randomRs (-(div width 2)+1 , (div width 2)-1 ) gx
+    let ys  = randomRs (-(div height 2)+1, (div height 2)-1) gy
     let lst = [ (x * grid, y * grid) | (x, y) <- (zip xs ys)]
     return lst
 
 -- Describe the state of the game.
 data SnakeGame = Game
-  { foodLoc :: [(Int, Int)]
-  , snakeLoc :: [(Int, Int)]
-  , snakeDir :: Char
-  , evilSnake :: [(Int, Int)]
+  { foodLoc    :: [(Int, Int)]
+  , snakeLoc   :: [(Int, Int)]
+  , snakeDir   :: Char
+  , evilSnake  :: [(Int, Int)]
   , roadToEvil :: Char --basically snakeDir but fo evil snake but only for debugging purposes
-  , meat :: Int
-  , steps ::Int
+  , meat       :: Int -- decide whether enemy snake chases snake or food
+  , steps      :: Int -- stall the enemy snake every
   } deriving Show
 
 
 -- | The starting state for the game
 initialState :: SnakeGame
 initialState = Game
-  { foodLoc = unsafePerformIO generateFood -- convert from IO [(Int, Int)] to [(Int, Int)]
-  , snakeLoc =  [(0,0)]       -- center of the screen
-  , snakeDir = 'w'
-  , evilSnake = [(200, 30)]
+  { foodLoc    = unsafePerformIO generateFood -- convert from IO [(Int, Int)] to [(Int, Int)]
+  , snakeLoc   = [(0,0)]       -- center of the screen
+  , snakeDir   = 'w'
+  , evilSnake  = [( (div width 3)*grid, (div height 3)*grid )]
   , roadToEvil = 'w' --basically snakeDir but fo evil snake
-  , meat = 2 -- 0: chase food,
-  , steps = 0
+  , meat       = 0 -- 0: chase food, 1: chase snake
+  , steps      = 0
   }
-
--- return the rest of the food
-moveFood (h:t) = t
 
 -- | Convert a game state into a picture.
 render :: SnakeGame  -- ^ The game state to render.
@@ -129,22 +118,20 @@ render game =
   where
     food = uncurry translate loc $ color foodColor $ circleSolid 10
     loc = (fromIntegral(fst (head (foodLoc game))), fromIntegral(snd (head (foodLoc game))))
-    foodColor = red
-    snake = drawSnake snakeLocToFloat
-    otherSnake = drawESnake [ (fromIntegral(x), fromIntegral(y)) | (x,y) <- evilSnake game]
+    snake = drawSnake (snakeLocToFloat snakeLoc) False
+    otherSnake = drawSnake (snakeLocToFloat evilSnake) True
     -- convert from Int to Float for gloss
-    snakeLocToFloat = [ (fromIntegral(x), fromIntegral(y)) | (x,y) <- snakeLoc game]
+    snakeLocToFloat s = [ (fromIntegral(x), fromIntegral(y)) | (x,y) <- s game]
     gridF = fromIntegral(grid)
     --actually draws the snake
-    drawSnake list = (pictures (drawSnakeH list))
-    drawSnakeH  [] = []
-    drawSnakeH  (h:t) = (drawPart h):(drawSnakeH t)
-    drawPart (x,y) = translate x y (rectangleSolid gridF gridF)
-    --draws the evil snakey
-    drawESnake list = (pictures (drawESnakeH list))
-    drawESnakeH  [] = []
-    drawESnakeH  (h:t) = (drawEvilPart h):(drawESnakeH t)
-    drawEvilPart (x,y) = color green (translate x y (rectangleSolid gridF gridF))
+    drawSnake lst enemySnake
+      | enemySnake = pictures (drawSnakeH lst eColor)
+      | otherwise  = pictures ((drawPart (head lst) sHeadColor):(drawSnakeH (tail lst) sColor))
+      where
+        drawSnakeH [] _    = []
+        drawSnakeH (h:t) c = (drawPart h c):(drawSnakeH t c)
+        --picture part
+        drawPart (x,y) c   = color c $ translate x y (rectangleSolid gridF gridF)
 
 --snake render and move
 moveSnake dir (h:t)
@@ -156,8 +143,8 @@ moveSnake dir (h:t)
       x = fst h
       y = snd h
       updateSnake :: Int -> Int -> [(Int, Int)] -> [(Int, Int)]
-      updateSnake _ _ [] = []
-      updateSnake x y (h:t)= (x,y):(updateSnake (fst h) (snd h) t)
+      updateSnake _ _ []    = []
+      updateSnake x y (h:t) = (x,y):(updateSnake (fst h) (snd h) t)
 
 
 -- | Respond to key events.
@@ -172,38 +159,52 @@ handleKeys _ game = game
 
 update :: Float -> SnakeGame -> SnakeGame
 update second game
-  --if snake eats food (snake head = food location)
+  --snake is out of bounds
   | touchBoundary (head (snakeLoc game)) == True =
      trace ("snake out of bound: " )
-     game {
-          snakeLoc = [] ----todo make end scene, rn it jsut dissapepars
-           }
+     game
+      { snakeLoc = [] ----todo make end scene, rn it jsut dissapepars
+      }
+  --snake touches itself
   | touchySelf (snakeLoc game) ==True =
-       trace ("snake ate itself: " )
-       game {
-            snakeLoc = [] ----todo make end scene, rn it jsut dissapepars
-             }
-
-  | (steps game) >3 =game {
-     snakeLoc = nextLoc
-     ,steps = 0}
-  | head nextLoc == head (foodLoc game) =
-    game { foodLoc = moveFood (foodLoc game) --move food
-      , snakeLoc = (head nextLoc):(snakeLoc game) --add to snake
-      ,evilSnake = pythonLoc
-      ,roadToEvil = pythonDir
-      ,steps = (steps game) + 1
+      trace ("snake ate itself: " )
+      game
+       { snakeLoc = [] ----todo make end scene, rn it jsut dissapepars
+       }
+  --snake eats food
+  | head nextLoc == head (foodLoc game) = game
+     { foodLoc    = moveFood (foodLoc game) --move food
+     , snakeLoc   = (head nextLoc):(snakeLoc game) --add to snake
+     , evilSnake  = pythonLoc
+     , roadToEvil = pythonDir
+     , steps      = (steps game) + 1
+     }
+  --enemy snake eats food
+  | head pythonLoc == head (foodLoc game) = game
+     { foodLoc   = moveFood (foodLoc game)
+     , snakeLoc  = nextLoc
+     , evilSnake = pythonLoc
+     , steps     = (steps game) + 1
+     }
+  --stall enemy snake to make the game easier
+  | (steps game) > stall = game
+     { snakeLoc = nextLoc
+     , steps    = 0
+     }
+  --nothing happens
+  | otherwise = game
+    { snakeLoc   = nextLoc
+    , evilSnake  = pythonLoc
+    , roadToEvil = pythonDir
+    , steps      = (steps game) + 1
     }
-  | otherwise = game {
-    snakeLoc = nextLoc,
-    evilSnake = pythonLoc
-    ,roadToEvil = pythonDir
-    ,steps = (steps game) + 1}
 
   where
-    nextLoc = moveSnake (snakeDir game) (snakeLoc game)
+    nextLoc   = moveSnake (snakeDir game) (snakeLoc game)
     pythonDir = (evilWays (roadToEvil game)(head (evilSnake game))(meat game) (head(foodLoc game)) (snakeLoc game)) --todo update this
     pythonLoc = moveSnake pythonDir (evilSnake game)
+    -- return the rest of the food
+    moveFood (h:t) = t
 
 main :: IO ()
 main = play window background speed initialState render handleKeys update
