@@ -175,13 +175,18 @@ handleKeys (EventKey (Char key) _ _ _) game
   | key == 's' && (snakeDir game) /= 'w' = game { snakeDir = key }
   | key == 'a' && (snakeDir game) /= 'd' = game { snakeDir = key }
   | key == 'd' && (snakeDir game) /= 'a' = game { snakeDir = key }
+  | (menu game) == 0 && key == '1' = game { meat = 0 } --enemy chases food
+  | (menu game) == 0 && key == '2' = game { meat = 1 } --enemy chases you
   | otherwise = game
 handleKeys (EventKey (SpecialKey key) _ _ _) game
   | key == KeyUp    && (snakeDir game) /= 's' = game { snakeDir = 'w' }
   | key == KeyDown  && (snakeDir game) /= 'w' = game { snakeDir = 's' }
   | key == KeyLeft  && (snakeDir game) /= 'd' = game { snakeDir = 'a' }
   | key == KeyRight && (snakeDir game) /= 'a' = game { snakeDir = 'd' }
-  | key == KeySpace && (menu game) == 0 = initialState { menu = 1 } -- start game
+  | key == KeySpace && (menu game) == 0 = initialState
+      { meat = (meat game)
+      , menu = 1
+      } -- start game
   | key == KeyEnter && (menu game) == 2 = game { menu = 0 } -- go to init screen
   | key == KeyEsc = game { snakeLoc = [] } -- exit game
   | otherwise = game
@@ -203,21 +208,13 @@ update second game
       trace ("snake crashed into enemy")
       gameOver
   --snake eats food
-  | head nextLoc == head (foodLoc game) = game
-      { foodLoc      = decapitate (foodLoc game) --move food
-      , snakeLoc     = (head nextLoc):(snakeLoc game) --add to snake
-      , evilSnake    = pythonLoc
-      , roadToEvil   = pythonDir
-      , choiceOfEvil = decapitate (choiceOfEvil game)
-      , steps        = (steps game) + 1
+  | head nextLoc == head (foodLoc game) = continue
+      { foodLoc  = decapitate (foodLoc game) --move food
+      , snakeLoc = (head nextLoc):(snakeLoc game) --add to snake
       }
   --enemy snake eats food
-  | head pythonLoc == head (foodLoc game) = game
-      { foodLoc      = decapitate (foodLoc game)
-      , snakeLoc     = nextLoc
-      , evilSnake    = pythonLoc
-      , choiceOfEvil = decapitate (choiceOfEvil game)
-      , steps        = (steps game) + 1
+  | head pythonLoc == head (foodLoc game) = continue
+      { foodLoc  = decapitate (foodLoc game)
       }
   --stall enemy snake to make the game easier
   | (steps game) > stall = game
@@ -225,14 +222,7 @@ update second game
       , steps    = 0
       }
   --nothing happens
-  | otherwise = game
-      { snakeLoc     = nextLoc
-      , evilSnake    = pythonLoc
-      , roadToEvil   = pythonDir
-      , choiceOfEvil = decapitate (choiceOfEvil game)
-      , steps        = (steps game) + 1
-      }
-
+  | otherwise = continue
   where
     nextLoc   = moveSnake (snakeDir game) (snakeLoc game)
     pythonDir = evilWays (roadToEvil game)(head (evilSnake game))(meat game) (head(foodLoc game)) (snakeLoc game) (head (choiceOfEvil game))
@@ -242,9 +232,16 @@ update second game
       { foodLoc = decapitate (foodLoc game)
       , menu = 2
       }
+    -- normal case, move snakes forward
+    continue = game
+      { snakeLoc     = nextLoc
+      , evilSnake    = pythonLoc
+      , roadToEvil   = pythonDir
+      , choiceOfEvil = decapitate (choiceOfEvil game)
+      , steps        = (steps game) + 1
+      }
     -- return the rest of the list
     decapitate (h:t) = t
 
 main :: IO ()
-main = do   wall <- loadBMP "snake.bmp"
-            play window background speed initialState render handleKeys update
+main = play window background speed initialState render handleKeys update
