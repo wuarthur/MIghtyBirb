@@ -12,7 +12,7 @@ import Debug.Trace
 grid, width, height, offset, speed, stall :: Int
 grid   = 20
 width  = 50
-height = 20
+height = 30
 offset = 100
 speed  = 5  -- so we move 1 grid space per 1/speed seconds
 stall  = 1  -- enemy snake pauses a step every stall steps (at stall = 1, the enemy snake runs at half the speed of the player)
@@ -39,63 +39,6 @@ sColor     = (makeColor 0.11 0.149 0.294 1)
 eColor     = (makeColor 0.38 0.733 0.286 1)
 
 
---randomly generate the order of turns the enemy snake makes
-elementOfMystery =
-  do
-    p <- newStdGen
-    let d  = randomRs (0, 5 :: Int) p
-    return d
-
---enemy snake moves horizontally towards the target
-horizontalCrawl dir (x,y) (x1,y1)
-    | x > x1    = 'a'
-    | x < x1    = 'd'
-    --same horizontal coordinate as the target, must move vertically
-    | otherwise = verticalCrawl dir (x,y) (x1,y1)
-
---enemy snake moves vertically towards the target
-verticalCrawl dir (x,y) (x1,y1)
-    | y > y1    = 's'
-    | y < y1    = 'w'
-    --same vertical coordinate as the target, must move horizontally
-    | otherwise = horizontalCrawl dir (x,y) (x1,y1)
-
---enemy snake's ai
-evilWays dir myLoc meat foodLoc snake crawlType
-    --go for the enemy snake
-    | meat == 0 = eat dir myLoc foodLoc
-    --go for the food
-    | otherwise = eat dir myLoc (head snake)
-    where
-      eat dir me destination
-        | crawlType == 0 = horizontalCrawl dir me destination
-        | otherwise      = verticalCrawl dir me destination
-
---check if snake touches itself
-touchySelf (h:t) = touchy h t
---check if snake touches enemy
-touchEnemy me enemy = touchy me enemy
-
---check if snake touches any element in the list
-touchy myHead [] = False
-touchy myHead (h:t)
-    | myHead == h = True
-    | otherwise = touchy myHead t
-
---check if snake goes out of bounds
-touchBoundary (x, y)
-    | x < minX + 1 || x > maxX - 1 || y < minY + 1 || y > maxY - 1 = True
-    | otherwise    = False
-
---generate a list of food locations
-generateFood =
-  do
-    gx <- newStdGen
-    gy <- newStdGen
-    let xs  = randomRs (-(div width 2)+1 , (div width 2)-1 ) gx
-    let ys  = randomRs (-(div height 2)+1, (div height 2)-1) gy
-    let lst = [ (x * grid, y * grid) | (x, y) <- (zip xs ys)]
-    return lst
 
 -- Describe the state of the game.
 data SnakeGame = Game
@@ -124,6 +67,22 @@ initialState = Game
   , steps        = 0
   , menu         = 0 -- 0: start game, 1: play game, 2: game over
   }
+  where
+    --generate a list of food locations
+    generateFood =
+      do
+        gx <- newStdGen
+        gy <- newStdGen
+        let xs  = randomRs (-(div width 2)+1 , (div width 2)-1 ) gx
+        let ys  = randomRs (-(div height 2)+1, (div height 2)-1) gy
+        let lst = [ (x * grid, y * grid) | (x, y) <- (zip xs ys)]
+        return lst
+    --randomly generate the order of turns the enemy snake makes
+    elementOfMystery =
+      do
+        p <- newStdGen
+        let d  = randomRs (0, 5 :: Int) p
+        return d
 
 -- | Convert a game state into a picture.
 render :: SnakeGame  -- ^ The game state to render.
@@ -165,18 +124,6 @@ render game
     wallWidth = fromIntegral(width * grid)
     wallHeight = fromIntegral(height * grid)
 
---snake render and move
-moveSnake dir (h:t)
-    | dir == 'w' =  (x, y+grid):(updateSnake x y t)
-    | dir == 's' =  (x, y-grid):(updateSnake x y t)
-    | dir == 'a' =  (x-grid, y):(updateSnake x y t)
-    | dir == 'd' =  (x+grid, y):(updateSnake x y t)
-    where
-      x = fst h
-      y = snd h
-      updateSnake :: Int -> Int -> [(Int, Int)] -> [(Int, Int)]
-      updateSnake _ _ []    = []
-      updateSnake x y (h:t) = (x,y):(updateSnake (fst h) (snd h) t)
 
 
 -- Respond to key events.
@@ -222,12 +169,12 @@ update second game
       gameOver
   --snake eats food
   | head nextLoc == head (foodLoc game) = continue
-      { foodLoc  = decapitate (foodLoc game) --move food
+      { foodLoc  = tail (foodLoc game) --move food
       , snakeLoc = (head nextLoc):(snakeLoc game) --add to snake
       }
   --enemy snake eats food
   | head pythonLoc == head (foodLoc game) = continue
-      { foodLoc  = decapitate (foodLoc game)
+      { foodLoc  = tail (foodLoc game)
       }
   --stall enemy snake to make the game easier
   | (steps game) > stall = game
@@ -237,12 +184,9 @@ update second game
   --nothing happens
   | otherwise = continue
   where
-    nextLoc   = moveSnake (snakeDir game) (snakeLoc game)
-    pythonDir = evilWays (roadToEvil game)(head (evilSnake game))(meat game) (head(foodLoc game)) (snakeLoc game) (head (choiceOfEvil game))
-    pythonLoc = moveSnake pythonDir (evilSnake game)
     -- show game over screen
     gameOver = game
-      { foodLoc = decapitate (foodLoc game)
+      { foodLoc = tail (foodLoc game)
       , menu = 2
       }
     -- normal case, move snakes forward
@@ -250,11 +194,69 @@ update second game
       { snakeLoc     = nextLoc
       , evilSnake    = pythonLoc
       , roadToEvil   = pythonDir
-      , choiceOfEvil = decapitate (choiceOfEvil game)
+      , choiceOfEvil = tail (choiceOfEvil game)
       , steps        = (steps game) + 1
       }
-    -- return the rest of the list
-    decapitate (h:t) = t
+
+    --Game over check
+    --check if snake touches itself
+    touchySelf (h:t) = touchy h t
+    --check if snake touches enemy
+    touchEnemy me enemy = touchy me enemy
+
+    --check if snake touches any element in the list
+    touchy myHead [] = False
+    touchy myHead (h:t)
+        | myHead == h = True
+        | otherwise = touchy myHead t
+
+    --check if snake goes out of bounds
+    touchBoundary (x, y)
+        | x < minX + 1 || x > maxX - 1 || y < minY + 1 || y > maxY - 1 = True
+        | otherwise    = False
+
+
+    --snake render and move
+    nextLoc   = moveSnake (snakeDir game) (snakeLoc game)
+    moveSnake dir (h:t)
+        | dir == 'w' =  (x, y+grid):(updateSnake x y t)
+        | dir == 's' =  (x, y-grid):(updateSnake x y t)
+        | dir == 'a' =  (x-grid, y):(updateSnake x y t)
+        | dir == 'd' =  (x+grid, y):(updateSnake x y t)
+        where
+          x = fst h
+          y = snd h
+          updateSnake :: Int -> Int -> [(Int, Int)] -> [(Int, Int)]
+          updateSnake _ _ []    = []
+          updateSnake x y (h:t) = (x,y):(updateSnake (fst h) (snd h) t)
+
+
+    --enemy snake's ai
+    pythonLoc = moveSnake pythonDir (evilSnake game)
+    pythonDir = evilWays (roadToEvil game)(head (evilSnake game))(meat game) (head(foodLoc game)) (snakeLoc game) (head (choiceOfEvil game))
+    evilWays dir myLoc meat foodLoc snake crawlType
+        --go for the enemy snake
+        | meat == 0 = eat dir myLoc foodLoc
+        --go for the food
+        | otherwise = eat dir myLoc (head snake)
+        where
+          eat dir me destination
+            | crawlType == 0 = horizontalCrawl dir me destination
+            | otherwise      = verticalCrawl dir me destination
+          --enemy snake moves horizontally towards the target
+          horizontalCrawl dir (x,y) (x1,y1)
+              | x > x1    = 'a'
+              | x < x1    = 'd'
+              --same horizontal coordinate as the target, must move vertically
+              | otherwise = verticalCrawl dir (x,y) (x1,y1)
+
+          --enemy snake moves vertically towards the target
+          verticalCrawl dir (x,y) (x1,y1)
+              | y > y1    = 's'
+              | y < y1    = 'w'
+              --same vertical coordinate as the target, must move horizontally
+              | otherwise = horizontalCrawl dir (x,y) (x1,y1)
+
 
 main :: IO ()
 main = play window background speed initialState render handleKeys update
