@@ -25,11 +25,11 @@ license:             BSD3
 license-file:        LICENSE
 
 -- The package author(s).
-author:              Carol Leung, ._.
+author:              Carol Leung, Yi Yang, Wu Arthur, Yi Wu Yang Arthur
 
 -- An email address to which users can send suggestions, bug reports, and
 -- patches.
-maintainer:          carolleung8205@gmail.com
+maintainer:          w4f9@ugrad.cs.ubc.ca, n3v9a@ugrad.cs.ubc.ca, yaqixyz@gmail.com, sparklyBunnyRabbit24@yahoo.ca
 
 -- A copyright notice.
 -- copyright:
@@ -57,7 +57,7 @@ executable snakey
   -- other-extensions:
 
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.11 && <4.12, gloss==1.13.*, random==1.*, Euterpea,
+  build-depends:       base >=4.11 && <4.12, gloss==1.13.*, random==1.*
 
   -- Directories containing source files.
   -- hs-source-dirs:
