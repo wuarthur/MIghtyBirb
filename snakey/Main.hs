@@ -15,8 +15,9 @@ width  = 50
 height = 20
 offset = 100
 speed  = 5  -- so we move 1 grid space per 1/speed seconds
-stall  = 1  -- steps enemy snake can take before it waits a tick
+stall  = 1  -- enemy snake pauses a step every stall steps (at stall = 1, the enemy snake runs at half the speed of the player)
 
+maxY, minY, maxX, minX :: Int
 maxY = grid * (div height 2)
 minY = grid * (-(div height 2))
 maxX = grid * (div width 2)
@@ -27,32 +28,36 @@ minX = grid * (-(div width 2))
 window :: Display
 window = InWindow "Snakey" (width * grid, height * grid) (offset, offset)
 
-background :: Color
+background, wallColor :: Color
 background = white
-
-foodColor, sHeadColor, sColor, eColor, wallColor :: Color
-foodColor  = red
-sHeadColor = blue
-sColor     = black
-eColor     = green
 wallColor  = (makeColor 0.5 0.5 0.5 1)
 
+foodColor, sHeadColor, sColor, eColor :: Color
+foodColor  = (makeColor 0.882 0.137 0.294 1)
+sHeadColor = (makeColor 0.286 0.38 0.733 1)
+sColor     = (makeColor 0.11 0.149 0.294 1)
+eColor     = (makeColor 0.38 0.733 0.286 1)
+
+
+--randomly generate the order of turns the enemy snake makes
 elementOfMystery =
   do
     p <- newStdGen
     let d  = randomRs (0, 5 :: Int) p
     return d
 
---go to da place in a diff style
+--enemy snake moves horizontally towards the target
 horizontalCrawl dir (x,y) (x1,y1)
     | x > x1    = 'a'
     | x < x1    = 'd'
+    --same horizontal coordinate as the target, must move vertically
     | otherwise = verticalCrawl dir (x,y) (x1,y1)
 
---go to da place
+--enemy snake moves vertically towards the target
 verticalCrawl dir (x,y) (x1,y1)
     | y > y1    = 's'
     | y < y1    = 'w'
+    --same vertical coordinate as the target, must move horizontally
     | otherwise = horizontalCrawl dir (x,y) (x1,y1)
 
 --enemy snake's ai
@@ -70,6 +75,8 @@ evilWays dir myLoc meat foodLoc snake crawlType
 touchySelf (h:t) = touchy h t
 --check if snake touches enemy
 touchEnemy me enemy = touchy me enemy
+
+--check if snake touches any element in the list
 touchy myHead [] = False
 touchy myHead (h:t)
     | myHead == h = True
@@ -122,14 +129,16 @@ initialState = Game
 render :: SnakeGame  -- ^ The game state to render.
        -> Picture   -- ^ A picture of this game state.
 render game
+  --render start screen
   | (menu game) == 0 = pictures [startScreen, wallW, wallS, wallA, wallD]
+  --render game over screen
   | (menu game) == 2 = pictures [deadScreen, wallW, wallS, wallA, wallD]
   | otherwise = pictures [food, snake, otherSnake, wallW, wallS, wallA, wallD]
   where
-    --text
-    deadScreen = unsafePerformIO (loadBMP "gameover.bmp") :: Picture
-    --startScreen = translate -40 0 (text "press space to start")
+    --assets for start screen
     startScreen = unsafePerformIO (loadBMP "snake.bmp") :: Picture
+    --assets for game over screen
+    deadScreen = unsafePerformIO (loadBMP "gameover.bmp") :: Picture
     --food
     food = uncurry translate loc $ color foodColor $ circleSolid 10
     loc = (fromIntegral(fst (head (foodLoc game))), fromIntegral(snd (head (foodLoc game))))
@@ -140,9 +149,9 @@ render game
     snakeLocToFloat s = [ (fromIntegral(x), fromIntegral(y)) | (x,y) <- s game]
     gridF = fromIntegral(grid)
     --actually draws the snake
-    drawSnake lst enemySnake
-      | enemySnake = pictures (drawSnakeH lst eColor)
-      | otherwise  = pictures ((drawPart (head lst) sHeadColor):(drawSnakeH (tail lst) sColor))
+    drawSnake lst isEnemySnake
+      | isEnemySnake = pictures (drawSnakeH lst eColor)
+      | otherwise    = pictures ((drawPart (head lst) sHeadColor):(drawSnakeH (tail lst) sColor))
       where
         drawSnakeH [] _    = []
         drawSnakeH (h:t) c = (drawPart h c):(drawSnakeH t c)
@@ -170,7 +179,8 @@ moveSnake dir (h:t)
       updateSnake x y (h:t) = (x,y):(updateSnake (fst h) (snd h) t)
 
 
--- | Respond to key events.
+-- Respond to key events.
+--char keys
 handleKeys (EventKey (Char key) _ _ _) game
   | key == 'w' && (snakeDir game) /= 's' = game { snakeDir = key }
   | key == 's' && (snakeDir game) /= 'w' = game { snakeDir = key }
@@ -179,6 +189,7 @@ handleKeys (EventKey (Char key) _ _ _) game
   | (menu game) == 0 && key == '1' = game { meat = 0 } --enemy chases food
   | (menu game) == 0 && key == '2' = game { meat = 1 } --enemy chases you
   | otherwise = game
+--special keys
 handleKeys (EventKey (SpecialKey key) _ _ _) game
   | key == KeyUp    && (snakeDir game) /= 's' = game { snakeDir = 'w' }
   | key == KeyDown  && (snakeDir game) /= 'w' = game { snakeDir = 's' }
@@ -205,6 +216,7 @@ update second game
   | touchySelf (snakeLoc game) =
       trace ("snake ate itself")
       gameOver
+  --snake touches enemy
   | touchEnemy (head (snakeLoc game)) (evilSnake game) =
       trace ("snake crashed into enemy")
       gameOver
