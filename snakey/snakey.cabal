@@ -25,11 +25,9 @@ license:             BSD3
 license-file:        LICENSE
 
 -- The package author(s).
-<<<<<<< HEAD
-author:              Carol Leung
-=======
+
 author:              Carol Leung, Yi Yang, Wu Arthur, Yi Wu Yang Arthur
->>>>>>> 8554f050a106ce6c317fa2e6d32d62948bbce894
+
 
 -- An email address to which users can send suggestions, bug reports, and
 -- patches.
