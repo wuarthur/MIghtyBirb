@@ -8,6 +8,7 @@ import System.IO.Unsafe
 import Debug.Trace
 
 
+
 grid, width, height, offset, speed, stall :: Int
 grid   = 20
 width  = 50

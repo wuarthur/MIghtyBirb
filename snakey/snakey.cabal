@@ -25,7 +25,7 @@ license:             BSD3
 license-file:        LICENSE
 
 -- The package author(s).
-author:              Carol Leung, ._.
+author:              Carol Leung
 
 -- An email address to which users can send suggestions, bug reports, and
 -- patches.
@@ -57,7 +57,7 @@ executable snakey
   -- other-extensions:
 
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.11 && <4.12, gloss==1.13.*, random==1.*, Euterpea,
+  build-depends:       base >=4.11 && <4.12, gloss==1.13.*, random==1.*, Euterpea==2.0.*
 
   -- Directories containing source files.
   -- hs-source-dirs:
