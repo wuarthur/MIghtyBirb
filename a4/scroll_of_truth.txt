@@ -1,0 +1,29 @@
+Q1.
+a.
+    i)listing(assignment(_, september, Y)).
+
+    ii) assignment(as1, september, 13).
+        assignment(as2, september, 20).
+        assignment(as3, september, 30).
+
+
+b.
+    i)email(TA,Email), ta(_,_,TA).
+    ii) TA = ainaz,
+        Email = "ainaz@cs.ubc.ca"
+
+c.
+    i)office_hour(ID, Day, _,_), office_hour(ID2, Day, _,_), name(ID, FirstName1, _), name(ID2, FirstName2, _).
+    ii)ID = ID2, ID2 = davidp,
+       Day = wednesday,
+       FirstName1 = FirstName2, FirstName2 = "David" ;
+       ID = davidp,
+       Day = wednesday,
+       ID2 = liran,
+       FirstName1 = "David",
+       FirstName2 = "Liran"
+
+d.
+    i)ta(_,_,TA), not(office_hour(TA, _,_,_)).
+    ii)false
+    
