@@ -1,0 +1,40 @@
+(a) “What dates in September are assignments due?”
+i) assignment(A, 'september', D).
+ii)
+A = as1, D = 13;
+A = as2, D = 20;
+A = as3, D = 30.
+
+
+(b) “What is the email of a TA of cs312 in 2018?” [Note that not all of the emails are for TAs.]
+i) email(P,E), ta('cs312',2018,P).
+ii)
+P = ainaz, E = "ainaz@cs.ubc.ca";
+P = liran, E = "liran.li@alumni.ubc.ca";
+P = rge,   E = "rge@cs.ubc.ca".
+
+
+(c) “What are the first names of two people have office hours on the same day?”
+i)
+name(P1,F1,L1), name(P2,F2,L2), office_hour(P1, D, S1, E1), office_hour(P2, D, S2, E2), not(P1 = P2).
+ii)
+P1 = davidp,   F1 = "David", L1 = "Poole",
+P2 = liran,    F2 = "Liran", L2 = "Li",
+D = wednesday, S1 = 15,      E1 = 16,             S2 = 17, E2 = 18;
+P1 = ainaz,    F1 = "Ainaz", L1 = "Hajimoradlou",
+P2 = rge,      F2 = "Rui",   L2 = "Ge",
+D = thursday,  S1 = 16,      E1 = 17,             S2 = 10, E2 = 11;
+P1 = liran,    F1 = "Liran", L1 = "Li",
+P2 = davidp,   F2 = "David", L2 = "Poole",
+D = wednesday, S1 = 17,      E1 = 18,             S2 = 15, E2 = 16;
+P1 = rge,      F1 = "Rui",   L1 = "Ge",
+P2 = ainaz,    F2 = "Ainaz", L2 = "Hajimoradlou",
+D = thursday,  S1 = 10,      E1 = 11,             S2 = 16, E2 = 17;
+
+(d) “Is there a TA who is not holding office hours?”
+i) ta(Course, Year, P), not(office_hour(P, D, S, F)).
+ii) false.
+iii) ta(cs312,2018,randomName).
+
+(e) What information would be required to compute number of classes before from exam?
+To compute the number of classes before the exam, we need the start date of the course, last day of the course, days of week the course happens in, holidays or days where there is no class. We already have the exam date.

@@ -1,0 +1,3 @@
+1) This question was straight forward after being familiar with the prolog syntax. I am not sure if we are allowed to use not() but I used it anyways.
+2) It took a bit of time to figure out which atoms are needed to express the axiomatization. The picture helped a lot.
+3) I had to carefully reread the lecture slides to figure out what the question was asking specifically. I learnt the keywords like derivation, box model and answer. I also learnt how to do a trace.

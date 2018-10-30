@@ -1,0 +1,72 @@
+(a)
+KB = {}
+outgrabe, manxome and wabe are true.
+KB = {outgrabe, manxome, wabe}
+
+outgrabe implies gyre and gimble.
+KB = {outgrabe, manxome, wabe, gyre, gimble}
+
+manxome implies vorpal, toves and gyre.
+KB = {outgrabe, manxome, wabe, gyre, gimble, vorpal, toves}
+
+slithy is true when gyre, gimble and wabe are true.
+KB = {outgrabe, manxome, wabe, gyre, gimble, vorpal, toves, slithy}
+
+(b)
+slithy :- toves, brillig.
+brillig :- jubjub.
+toves :- manxome.
+manxome.
+
+slithy is false because one of its atoms, brillig, is not true for every model of the knowledge base.
+
+(c)
+slithy :- gyre, gimble, wabe.
+gyre :- manxome.
+manxome.
+gimble :- vorpal.
+vorpal :- manxome.
+wabe.
+
+slithy is true because all of its atoms are not true for every model of the knowledge base.
+
+
+(d)
+[trace]  ?- slithy.
+  Call: (8) slithy ?            Call: try getting the value of slithy by getting the values of each of its atoms
+    Call: (9) toves ?
+      Call: (10) outgrabe ?
+      Exit: (10) outgrabe ?     Exit: value of outgrabe has been determined with the definite clauses (as true), continue.
+      Call: (10) vorpal ?
+        Call: (11) manxome ?
+        Exit: (11) manxome ?
+      Exit: (10) vorpal ?
+    Exit: (9) toves ?
+    Call: (9) brillig ?
+      Call: (10) jubjub ?
+      Fail: (10) jubjub ?
+    Fail: (9) brillig ?         Fail: value of brillig cannot be determined with the definite clauses (the value of brillig can be true or false), exit.
+    Redo: (9) toves ?           Redo: try getting the value of toves again using the new atoms
+      Call: (10) manxome ?
+      Exit: (10) manxome ?
+    Exit: (9) toves ?
+    Call: (9) brillig ?
+      Call: (10) jubjub ?
+      Fail: (10) jubjub ?
+    Fail: (9) brillig ?
+    Redo: (8) slithy ?
+    Call: (9) gyre ?
+      Call: (10) manxome ?
+      Exit: (10) manxome ?
+    Exit: (9) gyre ?
+    Call: (9) gimble ?
+      Call: (10) outgrabe ?
+      Exit: (10) outgrabe ?
+    Exit: (9) gimble ?
+    Call: (9) wabe ?
+    Exit: (9) wabe ?
+  Exit: (8) slithy ?
+true .
+
+(e)
+There is only 1 answer for slithy. Using the information from the world, slithy will always equate to true because of the rule slithy :- gyre, gimble, wabe. The other rule slithy :- toves, brillig. might or might not equate to true, but it doesn't matter because of the first rule.
