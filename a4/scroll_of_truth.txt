@@ -26,4 +26,4 @@ c.
 d.
     i)ta(_,_,TA), not(office_hour(TA, _,_,_)).
     ii)false
-    
+
