@@ -27,3 +27,75 @@ d.
     i)ta(_,_,TA), not(office_hour(TA, _,_,_)).
     ii)false
 
+e.
+    i)
+
+
+Q3.
+
+a.
+    bottom up proof:
+    kb = {manxome,wabe,outgrabe }.
+    gyre :- manxome.
+    kb = {manxome,wabe,outgrabe, gyre}.
+    toves :- manxome.
+    kb = {manxome,wabe,outgrabe, gyre, tove}.
+    vorpal :- manxome.
+    kb = {manxome,wabe,outgrabe, gyre, tove, vorpal}.
+    gimble :- outgrabe.
+    kb = {manxome,wabe,outgrabe, gyre, tove, vorpal, gimble}.
+    slithy :- gyre, gimble, wabe.
+    kb = {manxome,wabe,outgrabe, gyre, tove, vorpal, gimble,slithy}.
+
+b.
+    slithy :- toves, brillig.
+
+c.
+    slithy :- gyre, gimble, wabe.
+
+d.
+     T Call: (9) slithy
+       Call: (9) slithy ? creep    get slithy
+       Call: (10) toves ? creep     get toves which is required by  slithy :- toves, brillig.
+       Call: (11) outgrabe ? creep     get outgrabe which is required by toves :- outgrabe, vorpal.
+       Exit: (11) outgrabe ? creep      succeed
+       Call: (11) vorpal ? creep        get vorpal which is required by toves :- outgrabe, vorpal.
+       Call: (12) manxome ? creep       get manxome required by toves :- manxome.
+       Exit: (12) manxome ? creep       succeed
+       Exit: (11) vorpal ? creep
+       Exit: (10) toves ? creep
+       Call: (10) brillig ? creep
+       Call: (11) jubjub ? creep
+       Fail: (11) jubjub ? creep        failed to derive jubjub.
+       Fail: (10) brillig ? creep
+       Redo: (10) toves ? creep
+       Call: (11) manxome ? creep
+       Exit: (11) manxome ? creep
+       Exit: (10) toves ? creep
+       Call: (10) brillig ? creep
+       Call: (11) jubjub ? creep
+       Fail: (11) jubjub ? creep
+       Fail: (10) brillig ? creep
+     T Redo: (9) slithy
+       Redo: (9) slithy ? creep
+       Call: (10) gyre ? creep
+       Call: (11) manxome ? creep
+       Exit: (11) manxome ? creep
+       Exit: (10) gyre ? creep
+       Call: (10) gimble ? creep
+       Call: (11) outgrabe ? creep
+       Exit: (11) outgrabe ? creep
+       Exit: (10) gimble ? creep
+       Call: (10) wabe ? creep
+       Exit: (10) wabe ? creep
+     T Exit: (9) slithy
+       Exit: (9) slithy ? creep
+    true .
+
+e.
+    true because  slithy :- gyre, gimble, wabe. evaluate to true
+
+
+Q4.
+
+spent about 2 hours overall. Questions are reasonable.
