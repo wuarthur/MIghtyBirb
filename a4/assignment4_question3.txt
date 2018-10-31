@@ -14,22 +14,24 @@ KB = {outgrabe, manxome, wabe, gyre, gimble, vorpal, toves, slithy}
 
 (b)
 slithy :- toves, brillig.
-brillig :- jubjub.
-toves :- manxome.
-manxome.
+yes :- toves, brillig.
+yes :- manxome, brillig.
+yes :- brillig.
+yes :- jubjub.
 
-slithy is false because one of its atoms, brillig, is not true for every model of the knowledge base.
+jubjub cannot be resolved.
+toves, brillig is not a derivation of slithy.
 
 (c)
 slithy :- gyre, gimble, wabe.
-gyre :- manxome.
-manxome.
-gimble :- vorpal.
-vorpal :- manxome.
-wabe.
+yes :- manxome, gimble, wabe.
+yes :- gimble, wabe.
+yes :- vorpal, wabe.
+yes :- manxome, wabe.
+yes :- wabe.
+yes.
 
-slithy is true because all of its atoms are not true for every model of the knowledge base.
-
+gyre, gimble, wabe is a derivation of slithy.
 
 (d)
 [trace]  ?- slithy.
