@@ -28,7 +28,7 @@ d.
     ii)false
 
 e.
-    i)
+    i)something like class(date).
 
 
 Q3.
