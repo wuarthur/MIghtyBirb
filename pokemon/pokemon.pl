@@ -77,6 +77,30 @@ defence_factor(P, Pa, Points):-
   get_data(AllData, Pa, DefCol, Def),
   Points is Def/Atk/TypeF.
 
+% use this instead of get_pokemon_effectiveness() for attack_factor, since its the attack type that matters
+% defence_factor should still use get_pokemon_effectiveness because we do not know what moves enemy will use
+moves_factor(P, Pa, Points):-
+  get_move_set(Pa, Moves), %todo Moves is a list of Moves names
+  best_move(P, Pa, Moves, Rating, BestMove), %todo
+  Points is Rating.
+
+% Moves is a list of Moves names
+best_move(P, Pa, [NewMove|T], Rating, BestMove):-
+  move_rating(P, Pa, NewMove, NewRating),
+  NewRating> Rating -> best_move(P, Pa, T, NewRating, NewMove);
+  best_move(P, Pa, T, Rating, BestMove).
+
+% need to either a function that gets a row by name instead of row numebr, 
+% or make sure Moves in best_move() is a list of row numbers
+%Formula: Types Effectiveness * STAB
+%STAB is 1.25 if move is same type as Pa, 1 otherwise
+% move_rating(P, Pa, NewMove, NewRating):-
+%   get_rows_data("moves.csv", AllData),
+%   get_col_number(AllData, 'type', Type),
+%   get_data(AllData, NewMove, T1Col, Type1),
+
+
+
 %basing ration without moves 
 base_rating(P, Pa, Rating):-
   get_rows_data("pokedex.csv", AllData),
