@@ -41,6 +41,53 @@ get_pokemon_effectiveness(P, A, V):-
   get_attack_effectiveness(A, T2, V2),
   V is V1*V2.
 
+%0 if P faster than Pa, 1.25 if Pa is faster
+%Pa is attacking pokemon
+speed_factor(P, Pa, Points):-
+  get_rows_data("pokedex.csv", AllData),
+  get_col_number(AllData, 'Speed', SpedCol),
+  get_data(AllData, P, SpedCol, SpP),
+  get_data(AllData, Pa, SpedCol, SpPa),
+  SpP > SpPa -> Points is 1.25;
+  Points is 0.
+
+%returns attack/defence
+%Pa is attacking pokemon
+attack_factor(P, Pa, Points):-
+  get_rows_data("pokedex.csv", AllData),
+  get_col_number(AllData, 'Type 1', T1Col),
+  get_data(AllData, Pa, T1Col, Type1),
+  get_pokemon_effectiveness(P, Type1, TypeF),
+  get_col_number(AllData, 'Attack', AtkCol),
+  get_col_number(AllData, 'Defense', DefCol),
+  get_data(AllData, P, DefCol, Def),
+  get_data(AllData, Pa, AtkCol, Atk),
+  Points is TypeF*Atk/Def.
+
+%returns defence/attackb
+%Pa is attacking pokemon
+defence_factor(P, Pa, Points):-
+  get_rows_data("pokedex.csv", AllData),
+  get_col_number(AllData, 'Type 1', T1Col),
+  get_data(AllData, P, T1Col, Type1),
+  get_pokemon_effectiveness(Pa, Type1, TypeF),
+  get_col_number(AllData, 'Attack', AtkCol),
+  get_col_number(AllData, 'Defense', DefCol),
+  get_data(AllData, P, AtkCol, Atk),
+  get_data(AllData, Pa, DefCol, Def),
+  Points is Def/Atk/TypeF.
+
+%basing ration without moves 
+base_rating(P, Pa, Rating):-
+  get_rows_data("pokedex.csv", AllData),
+  get_col_number(AllData, 'HP', HPCol),
+  get_data(AllData, Pa, HPCol, PaHP),
+  get_data(AllData, P, HPCol, PHP),
+  speed_factor(P, Pa, SpeedF),
+  attack_factor(P, Pa, AtkF),
+  defence_factor(P, Pa, DefF),
+  Rating is 10/(PHP/(AtkF)-SpeedF) + (PaHP/DefF)*10.
+
 % TODO: user IO interface (Probably from command line. see Poole's geography.pl)
 % TODO: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd)
 % TODO: specify generation
