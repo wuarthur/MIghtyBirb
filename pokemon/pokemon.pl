@@ -40,3 +40,12 @@ get_pokemon_effectiveness(P, A, V):-
   get_attack_effectiveness(A, T1, V1),
   get_attack_effectiveness(A, T2, V2),
   V is V1*V2.
+
+% TODO: user IO interface (Probably from command line. see Poole's geography.pl)
+% TODO: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd)
+% TODO: specify generation
+% TODO: no legendaries + mythical pokemon
+% TODO: rival teams (random, following strategy, hard coded -- ex. champion teams)
+% TODO: find best match up for pokemon
+% TODO: doubles
+% TODO: moves - find csv, generate strategies (ex. 1 heal, 1 spatk, 1 atk, 1 buff)
