@@ -88,6 +88,28 @@ base_rating(P, Pa, Rating):-
   defence_factor(P, Pa, DefF),
   Rating is 10/(PHP/(AtkF)-SpeedF) + (PaHP/DefF)*10.
 
+% find pokemon with best rating against pokemon P
+% right now it only returns true .__.
+find_best_rating(_, Pbest, _, 720):-
+  Pbest is Pbest.
+find_best_rating(P, Pbest, BestRating, Row):-
+  Row is 720-> Pbest is Pbest;
+  Num is Row+0,
+  Next is Row+1,
+  base_rating(P, Num, Rating),
+  Rating > BestRating -> find_best_rating(P, Num, Rating, Next);
+  find_best_rating(P, Pbest, BestRating, Next).
+
+
+
+
+% largest(N):-
+%   dig(N),
+%   not((
+%       dig(M),
+%       M > N
+%   )).
+
 % TODO: user IO interface (Probably from command line. see Poole's geography.pl)
 % TODO: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd)
 % TODO: specify generation
