@@ -140,6 +140,8 @@ find_best_rating(P, Pbest, BestRating, Row):-
 % TODO: generate KB so that we only get the csv files once
 % TODO: user IO interface (Probably from command line. see Poole's geography.pl)
       % just make the basic frame for now, we will come up with the questions and possible interactions later
+% TODO: return a list of pokemon that takes X damage from an type or less
+      % ex. given a type, fire, and damage, 1, return a list of pokemon that takes less than 1 damage from fire
 % TODO: get pokemon with highest total base stat given a list of pokemon
       % literally add all of the stats together and return highest
 % TODO: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd)
