@@ -90,7 +90,7 @@ best_move(P, Pa, [NewMove|T], Rating, BestMove):-
   NewRating> Rating -> best_move(P, Pa, T, NewRating, NewMove);
   best_move(P, Pa, T, Rating, BestMove).
 
-% need to either a function that gets a row by name instead of row numebr, 
+% need to either a function that gets a row by name instead of row numebr,
 % or make sure Moves in best_move() is a list of row numbers
 %Formula: Types Effectiveness * STAB
 %STAB is 1.25 if move is same type as Pa, 1 otherwise
@@ -104,7 +104,7 @@ get_moveset(Pa, Moves):-
   Moves is AllData.
 
 
-%basing ration without moves 
+%basing ration without moves
 base_rating(P, Pa, Rating):-
   get_rows_data("pokedex.csv", AllData),
   get_col_number(AllData, 'HP', HPCol),
@@ -137,11 +137,34 @@ find_best_rating(P, Pbest, BestRating, Row):-
 %       M > N
 %   )).
 
+% TODO: generate KB so that we only get the csv files once
 % TODO: user IO interface (Probably from command line. see Poole's geography.pl)
+      % just make the basic frame for now, we will come up with the questions and possible interactions later
+% TODO: get pokemon with highest total base stat given a list of pokemon
+      % literally add all of the stats together and return highest
 % TODO: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd)
-% TODO: specify generation
+      % make a general formula that takes an order in an array ex. ['hp','speed',A,B,C,D] and a list of pokemon
+      % then returns the pokemon from the list that has the highest hp, then if there is a tie, highest speed etc
+% TODO: specify the stat strategy (ex. 2 atk, 2 sp atk, 1 hp, 1 spd)
+      % given a list of strats (so the above would be ['atk','atk','spatk','spatk','hp','spd']) and a list of pokemon
+      % return a pokemon team of 6
+% TODO: specify generation, takes in a number (for the generation) and a list of pokemon
+      % return a list of pokemon with a matching gen number
+      % we will specify gen 0 as all generations (no filtering)
 % TODO: no legendaries + mythical pokemon
+      % takes a list of pokemon and returns a list of pokemon that are not legendaries or mythical
 % TODO: rival teams (random, following strategy, hard coded -- ex. champion teams)
+      % start with hard coded ones first
+      % we will define the teams (probably in a csv or something)
+      % then do random
+      % randomly generate 6 pokemon. (allow for repeats???)
+      % then do strategy
+      % get the best 6 pokemon. start with 1, then check for type coverage (which weakenesses does it have), then do the 2nd one to cover those weakenesses
+      % (above formula is subject to change, idk the best way to generate pokemon teams)
 % TODO: find best match up for pokemon
+      % based on types. so we will find a counter pokemon for each rival pokemon
 % TODO: doubles
+      % 2 pokemon on a field at a time. idk if this is too similar to solo battles
+      % the only thing that's really affected are the moves it uses. might be put off
 % TODO: moves - find csv, generate strategies (ex. 1 heal, 1 spatk, 1 atk, 1 buff)
+      % DO THIS LAST
