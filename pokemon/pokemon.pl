@@ -138,23 +138,27 @@ find_best_rating(P, Pbest, BestRating, Row):-
 %   )).
 
 % TODO: generate KB so that we only get the csv files once
+      % pokedex takes 3 params (pokemon name, stat name, stat value)
+      % types takes 3 params (attack type, def type, value)
+      % moves takes 3 params (name, stat name, stat value)
+      % movesets takes 2 params (pokemon name, move name)
 % TODO: user IO interface (Probably from command line. see Poole's geography.pl)
       % just make the basic frame for now, we will come up with the questions and possible interactions later
-% TODO: return a list of pokemon that takes X damage from an type or less
-      % ex. given a type, fire, and damage, 1, return a list of pokemon that takes less than 1 damage from fire
-% TODO: get pokemon with highest total base stat given a list of pokemon
+% TODO: return a pokemon that takes X damage from an type or less
+      % ex. given a type, fire, and damage, 1, return a pokemon that takes less than 1 damage from fire
+% TODO: get pokemon with highest total base stat
       % literally add all of the stats together and return highest
 % TODO: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd)
-      % make a general formula that takes an order in an array ex. ['hp','speed',A,B,C,D] and a list of pokemon
+      % make a general formula that takes an order in an array ex. ['hp','speed',A,B,C,D]
       % then returns the pokemon from the list that has the highest hp, then if there is a tie, highest speed etc
 % TODO: specify the stat strategy (ex. 2 atk, 2 sp atk, 1 hp, 1 spd)
-      % given a list of strats (so the above would be ['atk','atk','spatk','spatk','hp','spd']) and a list of pokemon
+      % given a list of strats (so the above would be ['atk','atk','spatk','spatk','hp','spd'])
       % return a pokemon team of 6
-% TODO: specify generation, takes in a number (for the generation) and a list of pokemon
-      % return a list of pokemon with a matching gen number
+% TODO: specify generation, takes in a number (for the generation)
+      % return a pokemon with a matching gen number
       % we will specify gen 0 as all generations (no filtering)
 % TODO: no legendaries + mythical pokemon
-      % takes a list of pokemon and returns a list of pokemon that are not legendaries or mythical
+      % check if pokemon is not legendary
 % TODO: rival teams (random, following strategy, hard coded -- ex. champion teams)
       % start with hard coded ones first
       % we will define the teams (probably in a csv or something)
