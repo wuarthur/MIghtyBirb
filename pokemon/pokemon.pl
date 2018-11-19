@@ -99,6 +99,9 @@ best_move(P, Pa, [NewMove|T], Rating, BestMove):-
 %   get_col_number(AllData, 'type', Type),
 %   get_data(AllData, NewMove, T1Col, Type1),
 
+get_moveset(Pa, Moves):-
+  get_rows_data("movesets.csv", AllData),
+  Moves is AllData.
 
 
 %basing ration without moves 
