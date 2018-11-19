@@ -9,3 +9,4 @@ snakey/cabal.sandbox.config
 snakey/dist
 .cabal-sandbox/
 SNakey12/cabal.sandbox.config
+*.py
