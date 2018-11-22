@@ -10,3 +10,6 @@ snakey/dist
 .cabal-sandbox/
 SNakey12/cabal.sandbox.config
 *.py
+Mr_Prolog/settings.json
+Mr_Prolog/.vscode/settings.json
+Mr_Prolog/.vscode/settings.json

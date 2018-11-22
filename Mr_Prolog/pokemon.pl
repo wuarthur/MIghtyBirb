@@ -1,5 +1,4 @@
 
-:- module(pokemon, [pokeTypes/12]).
 pokeTypes(1,"Bulbasaur","Grass","Poison",45,49,49,65,65,45,1,"False").
 pokeTypes(2,"Ivysaur","Grass","Poison",60,62,63,80,80,60,1,"False").
 pokeTypes(3,"Venusaur","Grass","Poison",80,82,83,100,100,80,1,"False").
@@ -800,3 +799,58 @@ pokeTypes(797,"Mega Diancie","Rock","Fairy",50,160,110,160,110,110,6,"True").
 pokeTypes(798,"Hoopa Confined","Psychic","Ghost",80,110,60,150,130,70,6,"True").
 pokeTypes(799,"Hoopa Unbound","Psychic","Dark",80,160,60,170,130,80,6,"True").
 pokeTypes(800,"Volcanion","Fire","Water",80,110,120,130,90,70,6,"True").
+
+
+thereAreBetterSpeed(P):- pokeTypes(P,_,_,_,_,_,_,_,_,Total,_,_), pokeTypes(P2,_,_,_,_,_,_,_,_,Total2,_,_), P\=P2, Total2>Total.
+bestSpeed(P, L):- pokeTypes(P,_,_,_,_,_,_,_,_,Total,_,_), not(thereAreBetterSpeed(P)), L is Total, !.
+
+thereAreBetterSpAtk(P):- pokeTypes(P,_,_,_,_,_,_,_,Total,_,_,_), pokeTypes(P2,_,_,_,_,_,_,_,Total2,_,_,_), P\=P2, Total2>Total.
+bestSpAtk(P, L):- pokeTypes(P,_,_,_,_,_,_,_,Total,_,_,_), not(thereAreBetterSpAtk(P)), L is Total, !.
+
+thereAreBetterSpDef(P):- pokeTypes(P,_,_,_,_,_,_,Total,_,_,_,_), pokeTypes(P2,_,_,_,_,_,_,Total2,_,_,_,_), P\=P2, Total2>Total.
+bestSpDef(P, L):- pokeTypes(P,_,_,_,_,_,_,Total,_,_,_,_), not(thereAreBetterSpDef(P)), L is Total, !.
+
+thereAreBetterDef(P):- pokeTypes(P,_,_,_,_,_,Total,_,_,_,_,_), pokeTypes(P2,_,_,_,_,_,Total2,_,_,_,_,_), P\=P2, Total2>Total.
+bestDef(P, L):- pokeTypes(P,_,_,_,_,_,Total,_,_,_,_,_), not(thereAreBetterDef(P)), L is Total, !.
+
+thereAreBetterAtk(P):- pokeTypes(P,_,_,_,_,Total,_,_,_,_,_,_), pokeTypes(P2,_,_,_,_,_,Total2,_,_,_,_,_), P\=P2, Total2>Total.
+bestAtk(P, L):- pokeTypes(P,_,_,_,_,Total,_,_,_,_,_,_), not(thereAreBetterAtk(P)), L is Total, !.
+
+thereAreBetterHp(P):- pokeTypes(P,_,_,_,Total,_,_,_,_,_,_,_), pokeTypes(P2,_,_,_,_,Total2,_,_,_,_,_,_), P\=P2, Total2>Total.
+bestHp(P, L):- pokeTypes(P,_,_,_,Total,_,_,_,_,_,_,_), not(thereAreBetterHp(P)), L is Total, !.
+
+all_best(P, 'Speed'):-
+    bestSpeed(_, L),
+    pokeTypes(P,_,_,_,_,_,_,_,_,L,_,_).
+
+all_best(P, 'SpAtk'):-
+    bestSpAtk(_, L),
+    pokeTypes(P,_,_,_,_,_,_,_,L,_,_,_).
+
+all_best(P, 'SpDef'):-
+    bestSpDef(_, L),
+    pokeTypes(P,_,_,_,_,_,_,L,_,_,_,_).
+
+all_best(P, 'Def'):-
+    bestDef(_, L),
+    pokeTypes(P,_,_,_,_,_,L,_,_,_,_,_).
+
+all_best(P, 'Atk'):-
+    bestAtk(_, L),
+    pokeTypes(P,_,_,_,_,L,_,_,_,_,_,_).
+
+all_best(P, 'Hp'):-
+    bestHp(_, L),
+    pokeTypes(P,_,_,_,L,_,_,_,_,_,_,_).
+
+
+%List is the returned list of desired pokemon by their index
+%Stat are one of: 'Hp', 'Atk', 'Def', 'SpDef', 'SpAtk', 'Speed'
+%eg. get_all_best(List, 'Hp').
+% List = [122].
+% pokemon 122 has highest Hp alone.
+get_all_best(List, Stat):-
+    bagof(X, all_best(X, Stat), List).
+
+% 1   2    3       4   5    6       7       8       9      10    
+% #,Name,Type 1,Type 2,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed,Generation,Legendary

@@ -85,10 +85,10 @@ moves_factor(P, Pa, Points):-
   Points is Rating.
 
 % Moves is a list of Moves names
-best_move(P, Pa, [NewMove|T], Rating, BestMove):-
-  move_rating(P, Pa, NewMove, NewRating),
-  NewRating> Rating -> best_move(P, Pa, T, NewRating, NewMove);
-  best_move(P, Pa, T, Rating, BestMove).
+% best_move(P, Pa, [NewMove|T], Rating, BestMove):-
+%   move_rating(P, Pa, NewMove, NewRating),
+%   NewRating> Rating -> best_move(P, Pa, T, NewRating, NewMove);
+%   best_move(P, Pa, T, Rating, BestMove).
 
 % need to either a function that gets a row by name instead of row numebr,
 % or make sure Moves in best_move() is a list of row numbers
@@ -98,15 +98,54 @@ best_move(P, Pa, [NewMove|T], Rating, BestMove):-
 %   get_rows_data("moves.csv", AllData),
 %   get_col_number(AllData, 'type', Type),
 %   get_data(AllData, NewMove, T1Col, Type1),
+%todo
+% get_moveset( Moves):-
+%   get_rows_data("movesetsNew.csv", [H,H2|T]),
+%   Moves is H2.
 
-get_moveset(Pa, Moves):-
-  get_rows_data("movesets.csv", AllData),
-  Moves is AllData.
+
+%get_best_pokemon 
+% Order: order of importance of each stats by their column, eg. [6,5,7,8,9,10,11],
+% Last: last element of SortedList, which is also strongest by stats
+% note: to inlcude type, iterate SortedList from last element, return the first element of certain type
+get_best_pokemon(Order, Last):-
+  get_rows_data("pokedex.csv", AllData),
+  sort_by_importance(AllData, Order, [], SortedList),
+  last(SortedList, Last).
+
+%sort_by_importance([[42,'Golbat','Poison','Flying',455,75,80,70,65,75,90,1,'False'],['Butterfree','Bug','Flying',395,60,45,50,90,80,70,1,'False']],[6,5,7,8,9,10,11], [], Ret).
+sort_by_importance([], _, Acc, Ret):-
+  sort(Acc, SortedList), 
+  maplist(list_to_list, SortedList, Ret).
+
+sort_by_importance([H|T], Order, Acc, Ret):-
+  formatStat(H, Order, [], OnePokemon),
+  nth1(2, H, Name),
+  maplist(list_to_list, [Name|OnePokemon], NewPokemon),
+  sort_by_importance(T, Order, [NewPokemon|Acc], Ret).
+
+%just a helper
+list_to_list(List1, Ret):-
+  List1 = Ret.
+
+%formatStat([42,'Golbat','Poison','Flying',455,75,80,70,65,75,90,1,'False'],[6,5,7,8,9,10], [], Ret).
+formatStat( _, [], Acc, Ret) :- 
+  reverse(List1, Acc), 
+  maplist(list_to_list, List1, Ret).
+formatStat(List, [H|T], Acc, Ret):-
+  nth1(H, List, Elem),
+  %New is [Elem|Acc],
+  %print([Elem|Acc]),
+  formatStat(List, T, [Elem|Acc], Ret).
+
 
 
 %basing ration without moves
-base_rating(P, Pa, Rating):-
+base_rating(Pa, P, Rating):-
   get_rows_data("pokedex.csv", AllData),
+  get_col_number(AllData, 'Name', NameCol),
+  get_data(AllData, P, NameCol, LeName),
+  print(LeName),
   get_col_number(AllData, 'HP', HPCol),
   get_data(AllData, Pa, HPCol, PaHP),
   get_data(AllData, P, HPCol, PHP),
@@ -116,26 +155,20 @@ base_rating(P, Pa, Rating):-
   Rating is 10/(PHP/(AtkF)-SpeedF) + (PaHP/DefF)*10.
 
 % find pokemon with best rating against pokemon P
-% right now it only returns true .__.
-find_best_rating(_, Pbest, _, 720):-
-  Pbest is Pbest.
-find_best_rating(P, Pbest, BestRating, Row):-
-  Row is 720-> Pbest is Pbest;
+%find_best_rating(3, 0, 0, 1,X).
+find_base_best_rating(P, Pbest, BestRating, Row, X):-
+  Row is 720-> X is Pbest;
   Num is Row+0,
   Next is Row+1,
   base_rating(P, Num, Rating),
-  Rating > BestRating -> find_best_rating(P, Num, Rating, Next);
-  find_best_rating(P, Pbest, BestRating, Next).
+  Rating > BestRating -> find_best_rating(P, Num, Rating, Next, X);
+  find_best_rating(P, Pbest, BestRating, Next, X).
+
+%list is a list of strings containing only [Total,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed]
+%
 
 
 
-
-% largest(N):-
-%   dig(N),
-%   not((
-%       dig(M),
-%       M > N
-%   )).
 
 % TODO: generate KB so that we only get the csv files once
       % pokedex takes 3 params (pokemon name, stat name, stat value)
