@@ -104,14 +104,34 @@ moves_factor(P, Pa, Points):-
 %   Moves is H2.
 
 
-%get_best_pokemon 
-% Order: order of importance of each stats by their column, eg. [6,5,7,8,9,10,11],
-% Last: last element of SortedList, which is also strongest by stats
-% note: to inlcude type, iterate SortedList from last element, return the first element of certain type
-get_best_pokemon(Order, Last):-
+
+%filter to only have generation GenX, see test2().
+genX_only([], _, Acc, Ret):- 
+  maplist(list_to_list, Acc, Ret).
+genX_only([H|T], GenX, Acc, Ret):-
+  nth1(12, H, GenX)->genX_only(T, GenX, [H|Acc], Ret);
+  genX_only(T, GenX, Acc, Ret).
+
+
+test2(PokemonName):-
   get_rows_data("pokedex.csv", AllData),
-  sort_by_importance(AllData, Order, [], SortedList),
-  last(SortedList, Last).
+  genX_only(AllData, 1, [], GenXOnly),
+  get_best_pokemon(GenXOnly, [5,6,7,8,9,10,11], PokemonName).
+
+test1(PokemonName):-
+  get_rows_data("pokedex.csv", AllData),
+  get_best_pokemon(AllData, [6,5,7,8,9,10,11], PokemonName).
+
+%get_best_pokemon 
+%Data: list of pokemons see test1(), test2().
+% Order: order of importance of each stats by their column, eg. [6,5,7,8,9,10,11],
+% Last: Name of best pokemon
+% To get best stats for a type use a filter that filter out unwanted types
+get_best_pokemon(Data, Order, PokemonName):-
+  sort_by_importance(Data, Order, [], SortedList),
+  print(SortedList),
+  last(SortedList, Last),
+  nth1(8, Last, PokemonName).
 
 %sort_by_importance([[42,'Golbat','Poison','Flying',455,75,80,70,65,75,90,1,'False'],['Butterfree','Bug','Flying',395,60,45,50,90,80,70,1,'False']],[6,5,7,8,9,10,11], [], Ret).
 sort_by_importance([], _, Acc, Ret):-
@@ -121,10 +141,11 @@ sort_by_importance([], _, Acc, Ret):-
 sort_by_importance([H|T], Order, Acc, Ret):-
   formatStat(H, Order, [], OnePokemon),
   nth1(2, H, Name),
-  maplist(list_to_list, [Name|OnePokemon], NewPokemon),
+  append(OnePokemon,[Name],NewPokemon),
+  %maplist(list_to_list, [Name|OnePokemon], NewPokemon),
   sort_by_importance(T, Order, [NewPokemon|Acc], Ret).
 
-%just a helper
+%just a filter that does nothing
 list_to_list(List1, Ret):-
   List1 = Ret.
 
@@ -134,8 +155,6 @@ formatStat( _, [], Acc, Ret) :-
   maplist(list_to_list, List1, Ret).
 formatStat(List, [H|T], Acc, Ret):-
   nth1(H, List, Elem),
-  %New is [Elem|Acc],
-  %print([Elem|Acc]),
   formatStat(List, T, [Elem|Acc], Ret).
 
 
@@ -179,17 +198,17 @@ find_base_best_rating(P, Pbest, BestRating, Row, X):-
       % just make the basic frame for now, we will come up with the questions and possible interactions later
 % TODO: return a pokemon that takes X damage from an type or less
       % ex. given a type, fire, and damage, 1, return a pokemon that takes less than 1 damage from fire
-% TODO: get pokemon with highest total base stat
-      % literally add all of the stats together and return highest
-% TODO: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd)
+% TODO??: get pokemon with highest total base stat ----Call get_best_pokemon with 'Total' as number 1 priority
+      % literally add all of the stats together and return highest 
+% TODO??: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd) --Call get_best_pokemon
       % make a general formula that takes an order in an array ex. ['hp','speed',A,B,C,D]
       % then returns the pokemon from the list that has the highest hp, then if there is a tie, highest speed etc
 % TODO: specify the stat strategy (ex. 2 atk, 2 sp atk, 1 hp, 1 spd)
       % given a list of strats (so the above would be ['atk','atk','spatk','spatk','hp','spd'])
       % return a pokemon team of 6
-% TODO: specify generation, takes in a number (for the generation)
+% TODO???: specify generation, takes in a number (for the generation)
       % return a pokemon with a matching gen number
-      % we will specify gen 0 as all generations (no filtering)
+      % we will specify gen 0 as all generations (no filtering) --use genX_only().
 % TODO: no legendaries + mythical pokemon
       % check if pokemon is not legendary
 % TODO: rival teams (random, following strategy, hard coded -- ex. champion teams)
