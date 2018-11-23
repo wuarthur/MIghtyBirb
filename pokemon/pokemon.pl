@@ -119,7 +119,7 @@ test_typeX_only(PokemonName):-
   get_best_pokemon(TypeXOnly, [5,6,7,8,9,10,11], PokemonName).
 
 %filter to only have generation GenX, see test2().
-genX_only([], _, Acc, Ret):- 
+genX_only([], _, Acc, Ret):-
   maplist(list_to_list, Acc, Ret).
 genX_only([H|T], GenX, Acc, Ret):-
   nth1(12, H, GenX)->genX_only(T, GenX, [H|Acc], Ret);
@@ -153,7 +153,7 @@ test1(PokemonName):-
   get_rows_data("pokedex.csv", AllData),
   get_best_pokemon(AllData, [6,5,7,8,9,10,11], PokemonName).
 
-%get_best_pokemon 
+%get_best_pokemon
 %Data: list of pokemons see test1(), test2().
 % Order: order of importance of each stats by their column, eg. [6,5,7,8,9,10,11],
 % Last: Name of best pokemon
@@ -166,7 +166,7 @@ get_best_pokemon(Data, Order, PokemonName):-
 
 %sort_by_importance([[42,'Golbat','Poison','Flying',455,75,80,70,65,75,90,1,'False'],['Butterfree','Bug','Flying',395,60,45,50,90,80,70,1,'False']],[6,5,7,8,9,10,11], [], Ret).
 sort_by_importance([], _, Acc, Ret):-
-  sort(Acc, SortedList), 
+  sort(Acc, SortedList),
   maplist(list_to_list, SortedList, Ret).
 
 sort_by_importance([H|T], Order, Acc, Ret):-
@@ -181,8 +181,8 @@ list_to_list(List1, Ret):-
   List1 = Ret.
 
 %formatStat([42,'Golbat','Poison','Flying',455,75,80,70,65,75,90,1,'False'],[6,5,7,8,9,10], [], Ret).
-formatStat( _, [], Acc, Ret) :- 
-  reverse(List1, Acc), 
+formatStat( _, [], Acc, Ret) :-
+  reverse(List1, Acc),
   maplist(list_to_list, List1, Ret).
 formatStat(List, [H|T], Acc, Ret):-
   nth1(H, List, Elem),
@@ -230,7 +230,7 @@ find_base_best_rating(P, Pbest, BestRating, Row, X):-
 % TODO: return a pokemon that takes X damage from an type or less
       % ex. given a type, fire, and damage, 1, return a pokemon that takes less than 1 damage from fire
 % TODO??: get pokemon with highest total base stat ----Call get_best_pokemon with 'Total' as number 1 priority
-      % literally add all of the stats together and return highest 
+      % literally add all of the stats together and return highest
 % TODO??: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd) --Call get_best_pokemon
       % make a general formula that takes an order in an array ex. ['hp','speed',A,B,C,D]
       % then returns the pokemon from the list that has the highest hp, then if there is a tie, highest speed etc
