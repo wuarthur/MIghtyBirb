@@ -112,6 +112,24 @@ genX_only([H|T], GenX, Acc, Ret):-
   nth1(12, H, GenX)->genX_only(T, GenX, [H|Acc], Ret);
   genX_only(T, GenX, Acc, Ret).
 
+%usage see test_lengendary_only()
+lengendary_only([], Acc, Ret):-
+  maplist(list_to_list, Acc, Ret).
+lengendary_only([H|T], Acc, Ret):-
+  nth1(13, H, 'True')->lengendary_only(T, [H|Acc], Ret);
+  lengendary_only(T, Acc, Ret).
+%same usage as above just does the opposite
+no_lengendary([], Acc, Ret):-
+  maplist(list_to_list, Acc, Ret).
+no_lengendary([H|T], Acc, Ret):-
+  nth1(13, H, 'False')->no_lengendary(T, [H|Acc], Ret);
+  no_lengendary(T, Acc, Ret).
+
+
+test_lengendary_only(PokemonName):-
+  get_rows_data("pokedex.csv", AllData),
+  lengendary_only(AllData, [], Lengends),
+  get_best_pokemon(Lengends, [5,6,7,8,9,10,11], PokemonName).
 
 test2(PokemonName):-
   get_rows_data("pokedex.csv", AllData),
