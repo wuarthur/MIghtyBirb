@@ -104,7 +104,7 @@ moves_factor(P, Pa, Points):-
 %   Moves is H2.
 
 
-%get_best_pokemon 
+%get_best_pokemon
 % Order: order of importance of each stats by their column, eg. [6,5,7,8,9,10,11],
 % Last: last element of SortedList, which is also strongest by stats
 % note: to inlcude type, iterate SortedList from last element, return the first element of certain type
@@ -115,7 +115,7 @@ get_best_pokemon(Order, Last):-
 
 %sort_by_importance([[42,'Golbat','Poison','Flying',455,75,80,70,65,75,90,1,'False'],['Butterfree','Bug','Flying',395,60,45,50,90,80,70,1,'False']],[6,5,7,8,9,10,11], [], Ret).
 sort_by_importance([], _, Acc, Ret):-
-  sort(Acc, SortedList), 
+  sort(Acc, SortedList),
   maplist(list_to_list, SortedList, Ret).
 
 sort_by_importance([H|T], Order, Acc, Ret):-
@@ -129,8 +129,8 @@ list_to_list(List1, Ret):-
   List1 = Ret.
 
 %formatStat([42,'Golbat','Poison','Flying',455,75,80,70,65,75,90,1,'False'],[6,5,7,8,9,10], [], Ret).
-formatStat( _, [], Acc, Ret) :- 
-  reverse(List1, Acc), 
+formatStat( _, [], Acc, Ret) :-
+  reverse(List1, Acc),
   maplist(list_to_list, List1, Ret).
 formatStat(List, [H|T], Acc, Ret):-
   nth1(H, List, Elem),
@@ -166,44 +166,3 @@ find_base_best_rating(P, Pbest, BestRating, Row, X):-
 
 %list is a list of strings containing only [Total,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed]
 %
-
-
-
-
-% TODO: generate KB so that we only get the csv files once
-      % pokedex takes 3 params (pokemon name, stat name, stat value)
-      % types takes 3 params (attack type, def type, value)
-      % moves takes 3 params (name, stat name, stat value)
-      % movesets takes 2 params (pokemon name, move name)
-% TODO: user IO interface (Probably from command line. see Poole's geography.pl)
-      % just make the basic frame for now, we will come up with the questions and possible interactions later
-% TODO: return a pokemon that takes X damage from an type or less
-      % ex. given a type, fire, and damage, 1, return a pokemon that takes less than 1 damage from fire
-% TODO: get pokemon with highest total base stat
-      % literally add all of the stats together and return highest
-% TODO: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd)
-      % make a general formula that takes an order in an array ex. ['hp','speed',A,B,C,D]
-      % then returns the pokemon from the list that has the highest hp, then if there is a tie, highest speed etc
-% TODO: specify the stat strategy (ex. 2 atk, 2 sp atk, 1 hp, 1 spd)
-      % given a list of strats (so the above would be ['atk','atk','spatk','spatk','hp','spd'])
-      % return a pokemon team of 6
-% TODO: specify generation, takes in a number (for the generation)
-      % return a pokemon with a matching gen number
-      % we will specify gen 0 as all generations (no filtering)
-% TODO: no legendaries + mythical pokemon
-      % check if pokemon is not legendary
-% TODO: rival teams (random, following strategy, hard coded -- ex. champion teams)
-      % start with hard coded ones first
-      % we will define the teams (probably in a csv or something)
-      % then do random
-      % randomly generate 6 pokemon. (allow for repeats???)
-      % then do strategy
-      % get the best 6 pokemon. start with 1, then check for type coverage (which weakenesses does it have), then do the 2nd one to cover those weakenesses
-      % (above formula is subject to change, idk the best way to generate pokemon teams)
-% TODO: find best match up for pokemon
-      % based on types. so we will find a counter pokemon for each rival pokemon
-% TODO: doubles
-      % 2 pokemon on a field at a time. idk if this is too similar to solo battles
-      % the only thing that's really affected are the moves it uses. might be put off
-% TODO: moves - find csv, generate strategies (ex. 1 heal, 1 spatk, 1 atk, 1 buff)
-      % DO THIS LAST
