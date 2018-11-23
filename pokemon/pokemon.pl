@@ -103,7 +103,20 @@ moves_factor(P, Pa, Points):-
 %   get_rows_data("movesetsNew.csv", [H,H2|T]),
 %   Moves is H2.
 
+typeX_only([], _, Acc, Ret):- 
+  maplist(list_to_list, Acc, Ret).
+typeX_only([H|T], TypeX, Acc, Ret):-
+  nth1(3, H, TypeX)->typeX_only(T, TypeX, [H|Acc], Ret);
+  typeX_only(T, TypeX, Acc, Ret).
 
+% typeXY_only(Data, TypeX, TypeY, Ret):-
+%   typeX_only(AllData, TypeX, [], TypeXOnly),
+%   typeX_only(AllData, Typey, [], TypeYOnly),
+
+test_typeX_only(PokemonName):-
+  get_rows_data("pokedex.csv", AllData),
+  typeX_only(AllData, 'Water', [], TypeXOnly),
+  get_best_pokemon(TypeXOnly, [5,6,7,8,9,10,11], PokemonName).
 
 %filter to only have generation GenX, see test2().
 genX_only([], _, Acc, Ret):- 
