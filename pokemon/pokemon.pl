@@ -1,41 +1,9 @@
 :- use_module(library(apply)).
 :- use_module(library(csv)).
 :- dynamic pokeDex/3. pokeDex(num,col, value).
-
-import:-load().
-load():-
-  get_rows_data("pokedex.csv", AllData),
-  add_to_db(AllData).
+:- dynamic moveSet/3. 
 
 
-add_to_db([]).
-add_to_db([H|T]):-
-  nth1(1, H, Num),
-  nth1(2, H, Name),
-  nth1(3, H, Type1),
-  nth1(4, H, Type2),
-  nth1(5, H, Total),
-  nth1(6, H, HP),
-  nth1(7, H, Attack),
-  nth1(8, H, Defense),
-  nth1(9, H, SpAtk),
-  nth1(10, H, SpDef),
-  nth1(11, H, Speed),
-  nth1(12, H, Generation),
-  nth1(13, H, Legendary),
-  assert(pokeDex(Num,'Name', Name)),
-  assert(pokeDex(Num,'Type1', Type1)),
-  assert(pokeDex(Num,'Type2', Type2)),
-  assert(pokeDex(Num,'Total', Total)),
-  assert(pokeDex(Num,'HP', HP)),
-  assert(pokeDex(Num,'Attack', Attack)),
-  assert(pokeDex(Num,'Defense', Defense)),
-  assert(pokeDex(Num,'SpAtk', SpAtk)),
-  assert(pokeDex(Num,'SpDef', SpDef)),
-  assert(pokeDex(Num,'Speed', Speed)),
-  assert(pokeDex(Num,'Generation', Generation)),
-  assert(pokeDex(Num,'Legendary', Legendary)),
-  add_to_db(T).
 
 
 % taken from https://stackoverflow.com/questions/23183662/prolog-parsing-a-csv-file
@@ -253,3 +221,23 @@ find_base_best_rating(P, Pbest, BestRating, Row, X):-
 
 %list is a list of strings containing only [Total,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed]
 %
+
+
+import:-load().
+load():-
+  get_rows_data("pokedex.csv", [H|T]),
+  add_to_db(H, T).
+
+add_to_db(_, []).
+add_to_db(Col, [[Num|H]|T]):-
+  recursive_add(Col, H, Num),
+  add_to_db(Col, T).
+
+recursive_add([],_, _).
+recursive_add(_,[],_).
+recursive_add([C1|Ct], [Val|T],Num):-
+  nl(),
+  print(moveSet(Num,C1, Val)),
+  assert(moveSet(Num,C1, Val)),
+  recursive_add(Ct,T, Num).
+
