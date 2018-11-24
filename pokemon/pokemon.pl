@@ -1,7 +1,7 @@
 :- use_module(library(apply)).
 :- use_module(library(csv)).
 :- dynamic pokeDex/3. pokeDex(num,col, value).
-:- dynamic moveSet/3. 
+:- dynamic moveSet/2. 
 
 
 
@@ -225,7 +225,7 @@ find_base_best_rating(P, Pbest, BestRating, Row, X):-
 
 import:-load().
 load():-
-  get_rows_data("pokedex.csv", [H|T]),
+  get_rows_data("movesetsNew.csv", [H|T]),
   add_to_db(H, T).
 
 add_to_db(_, []).
@@ -237,7 +237,7 @@ recursive_add([],_, _).
 recursive_add(_,[],_).
 recursive_add([C1|Ct], [Val|T],Num):-
   nl(),
-  print(moveSet(Num,C1, Val)),
-  assert(moveSet(Num,C1, Val)),
+  print(moveSet(Num,Val)),
+  assert(moveSet(Num,Val)),
   recursive_add(Ct,T, Num).
 
