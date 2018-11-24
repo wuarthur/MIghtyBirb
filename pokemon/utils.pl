@@ -13,3 +13,10 @@ take(N, List, Res):-
 count(E, List, N):-
   include(=(E), List, Tmp),
   length(Tmp, N).
+
+
+product_list(List, Product):-
+  foldl(foldl_product, List, 1, Product).
+
+foldl_product(Curr, Acc, Next):-
+  Next is Curr * Acc.

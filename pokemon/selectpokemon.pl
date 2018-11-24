@@ -1,9 +1,11 @@
 :- use_module(library(clpfd)).
 
 
-%%%%%%%%%%%% Finds according to stats ie, select_pokemons(1, 'False', ['hp', 'hp', 'tot'], Indices).
+%%%%%%%%%%%% Finds according to stats
+%%%%%%%%%%%%%%%%% Try select_pokemons(1, 'False', ['hp', 'hp', 'tot'], Indices).
 %%%%%%%%%%%% Returns unique results
 %%%%%%%%%%% Not really an efficient impl :|, but it should suffice for now.
+%%%%% Has a bug if say one pokemon is best at two areas, it will be duplicated. Low priority bug?
 
 
 select_pokemons(Generation, Legendary, Stats, Indices):-

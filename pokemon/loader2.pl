@@ -1,5 +1,9 @@
 
 
+%%%%%%%%%%%%%%% Load V1 is kind crap, V2 is all triples.
+%%%%%%%%%%%%%% Ironically V1 took much longer to write :|
+
+
 %%%%%%%%%%%%%%%%%%%%%%%% Load all the CSV data.
 load:-
   load_pokedex,
