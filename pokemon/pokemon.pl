@@ -7,10 +7,10 @@
 
 import:-load().
 load():-
-  % get_rows_data("movesetsNew.csv", [H|T]),
-  % add_move(H, T),
-  % get_rows_data("moves.csv", [H2|T2]),
-  % add_move(H2, T2).
+  get_rows_data("movesetsNew.csv", [H|T]),
+  add_move(H, T),
+  get_rows_data("moves.csv", [H2|T2]),
+  add_move(H2, T2),
   get_rows_data("types.csv", [H3|T3]),
   add_types(H3, T3).
 
