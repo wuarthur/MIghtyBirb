@@ -233,11 +233,11 @@ add_to_db(Col, [[Num|H]|T]):-
   recursive_add(Col, H, Num),
   add_to_db(Col, T).
 
+recursive_add(_,[''],_).
+recursive_add(_,[''|_],_).
 recursive_add([],_, _).
-recursive_add(_,[],_).
 recursive_add([C1|Ct], [Val|T],Num):-
   nl(),
   print(moveSet(Num,Val)),
-  assert(moveSet(Num,Val)),
+  assert(moveSet(Num,Val)), 
   recursive_add(Ct,T, Num).
-
