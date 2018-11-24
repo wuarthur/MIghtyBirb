@@ -13,7 +13,7 @@ load:-
   load_moveset.
 
 load_pokedex:-
-  csv_read_file("pokedex.csv", [_|R]),
+  csv_read_file("./csvs/pokedex.csv", [_|R]),
   maplist(assertz_pokedex, R).
 
 assertz_pokedex(Row):-
@@ -41,7 +41,7 @@ load_def_types:-
   assertz(defense_type('sp_att', 'sp_def')).
 
 load_att_types:-
-  csv_read_file("types.csv", [_|R]),
+  csv_read_file("./csvs/types.csv", [_|R]),
   maplist(assertz_attack_multi, R).
 
 assertz_attack_multi(Row):-
@@ -71,7 +71,7 @@ pokemon(Idx, 'moveset', M):-
   M = moveset(Idx, _, _).
 
 load_moveset:-
-  csv_read_file("movesets.csv", [_|B]),
+  csv_read_file("./csvs/movesets.csv", [_|B]),
   maplist(assertz_moveset, B).
 
 assertz_moveset(Row):-
@@ -88,7 +88,7 @@ asserts_moveset_move(Idx, Move):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in moves into KB
 load_moves:-
-  csv_read_file("moves.csv", [_|B]),
+  csv_read_file("./csvs/moves.csv", [_|B]),
   maplist(assert_moves, B).
 
 assert_moves(M):-

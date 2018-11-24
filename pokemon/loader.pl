@@ -38,7 +38,7 @@ load_everything:-
 %% pokemon(Idx, name, Type, Generation, Legendary, ['Types'], [tuple2('Stat', Value)])
 
 load_pokedex:-
-  csv_read_file("pokedex.csv", [_|B]),
+  csv_read_file("./csvs/pokedex.csv", [_|B]),
   maplist(parse_pokedex_body, B, Res),
   maplist(assertz, Res).
 
@@ -59,7 +59,7 @@ parse_pokedex_body(B, Res):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in attack type %% def CSV into KB
 %% attacking('Att_Type', [tuple2('Def_Type', Multiplier)])
 load_att_types:-
-  csv_read_file("types.csv", [H|B]),
+  csv_read_file("./csvs/types.csv", [H|B]),
   row_to_list(H, [_ | Def_type]),
   maplist(row_to_list, B, Att_type_Multiplier),
   length(Att_type_Multiplier, Length),
@@ -75,7 +75,7 @@ create_type([Att_type | Multiplier], Def_type, Res):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in moveset into KB
 %% moveset(Idx, Species, Forme, [Moves])
 load_moveset:-
-  csv_read_file("movesets.csv", [_|B]),
+  csv_read_file("./csvs/movesets.csv", [_|B]),
   maplist(parse_moveset_body, B, Res),
   maplist(assertz, Res).
 
@@ -87,7 +87,7 @@ parse_moveset_body(B, Res):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in moves into KB
 load_moves:-
-  csv_read_file("moves.csv", [_|B]),
+  csv_read_file("./csvs/moves.csv", [_|B]),
   maplist(assert_moves, B).
 
 assert_moves(M):-
