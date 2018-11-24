@@ -41,6 +41,8 @@ recursive_type(_,[],_).
 recursive_type(_,[''|_],_).
 recursive_type([],_, _).
 recursive_type([C1|Ct], [Val|T],Num):-
+  nl(),
+  print(types(Num,C1, Val)),
   assert(types(Num,C1,Val)),
   recursive_type(Ct,T, Num).
 
@@ -82,7 +84,7 @@ row_to_list(Row, List):-
   Row =.. [row|List].
 
 % if there is no type, return null (targetted at pokemon with no second type)
-types(_,'',1).
+types('',_,1).
 
 % get the damage multiplier a type of move would make to a pokemon
 damageMultiplier(DefendingPokemon, AttackingType, MultiplierValueBetween0and4) :-
