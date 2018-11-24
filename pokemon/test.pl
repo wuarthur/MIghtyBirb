@@ -89,6 +89,12 @@ damageMultiplier(DefendingPokemon, AttackingType, MultiplierValueBetween0and4) :
   types(AttackingType,T2,V2),
   MultiplierValueBetween0and4 is V1*V2.
 
+% get pokemon with highest where stats = hp/atk/def/spatk/spdef/spd/base
+%https://stackoverflow.com/questions/40365709/prolog-getting-a-maximum-value-of-set-from-a-list-of-facts-using-fail-predica
+% TODO: why does this return the same pokemon multiple times??? should we fix it
+highestStat(Pokemon, StatName, Value):-
+  pokeDex(Pokemon, StatName, Value),
+  forall(pokeDex(Pokemon2, StatName, Value2),(Value2>Value->fail;true)).
 
 % autoload the kb
 :-loadt('hi').
