@@ -19,3 +19,11 @@ Please check out.
 
 
 I decided to do everything in triples like Prof said in class, makes things very convenient.
+
+
+
+**Carol***
+I've added some comments to battle.pl and more importantly game.pl
+Could you add some sample queries? I couldn't get them to work for some reason
+We've made it to creating teams too. We would probably scrap our code tho because I really had
+no idea what I was doing and your code is very neat.
