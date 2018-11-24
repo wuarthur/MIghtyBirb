@@ -1,6 +1,6 @@
 :- use_module(library(apply)).
 :- use_module(library(csv)).
-:- dynamic pokeDex/3. 
+:- dynamic pokeDex/3.
 :- dynamic moveSet/2.
 :- dynamic moves/3.
 :- dynamic types/3.
@@ -26,8 +26,6 @@ add_pokeDex(Col, [[Num|H]|T]):-
 recursive_dex(_,[],_).
 recursive_dex([],_, _).
 recursive_dex([C1|Ct], [Val|T],Num):-
-  %nl(),
-  %print(pokeDex(Num,C1, Val)),
   assert(pokeDex(Num,C1,Val)),
   recursive_dex(Ct,T, Num).
 
@@ -40,11 +38,9 @@ add_types(Col, [[Num|H]|T]):-
 recursive_type(_,[],_).
 recursive_type(_,[''|_],_).
 recursive_type([],_, _).
-recursive_type([C1|Ct], [Val|T],Num):-
-  nl(),
-  print(types(Num,C1, Val)),
-  assert(types(Num,C1,Val)),
-  recursive_type(Ct,T, Num).
+recursive_type([DefendingType|Ct], [Val|T],AttackingType):-
+  assert(types(AttackingType,DefendingType,Val)),
+  recursive_type(Ct,T, AttackingType).
 
 
 %%%%%%%%%%%%%
@@ -69,9 +65,9 @@ add_MoveSet(Col, [[Num|H]|T]):-
 recursive_moveset(_,[],_).
 recursive_moveset(_,[''|_],_).
 recursive_moveset([],_, _).
-recursive_moveset([C1|Ct], [Val|T],Num):-
-  assert(moveSet(Num,Val)),
-  recursive_moveset(Ct,T, Num).
+recursive_moveset([C1|Ct], [Move|T],Pokemon):-
+  assert(moveSet(Pokemon,Move)),
+  recursive_moveset(Ct,T, Pokemon).
 
 
 % taken from https://stackoverflow.com/questions/23183662/prolog-parsing-a-csv-file
@@ -89,16 +85,9 @@ types('',_,1).
 % get the damage multiplier a type of move would make to a pokemon
 damageMultiplier(DefendingPokemon, AttackingType, MultiplierValueBetween0and4) :-
   pokeDex(DefendingPokemon,'Type 1',T1),
-  %print(T1),
   pokeDex(DefendingPokemon,'Type 2',T2),
-  nl(),
- % print(T2),
-  types(T1,AttackingType,V1),
-  nl(),
-  %print(V1),
-  types(T2,AttackingType,V2),
-  nl(),
-  print(V2),
+  types(AttackingType,T1,V1),
+  types(AttackingType,T2,V2),
   MultiplierValueBetween0and4 is V1*V2.
 
 %damageMultiplier(DefendingPokemon, AttackingType, MultiplierValueBetween0and4)
