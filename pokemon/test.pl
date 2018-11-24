@@ -24,11 +24,10 @@ add_pokeDex(Col, [[Num|H]|T]):-
   add_pokeDex(Col, T).
 
 recursive_dex(_,[],_).
-recursive_dex(_,[''|_],_).
 recursive_dex([],_, _).
 recursive_dex([C1|Ct], [Val|T],Num):-
-  nl(),
-  print(pokeDex(Num,C1, Val)),
+  %nl(),
+  %print(pokeDex(Num,C1, Val)),
   assert(pokeDex(Num,C1,Val)),
   recursive_dex(Ct,T, Num).
 
@@ -87,16 +86,14 @@ types(_,'',1).
 
 % get the damage multiplier a type of move would make to a pokemon
 damageMultiplier(DefendingPokemon, AttackingType, MultiplierValueBetween0and4) :-
-  print(DefendingPokemon),
   pokeDex(DefendingPokemon,'Type 1',T1),
-  nl(),
-  print(T1),
+  %print(T1),
   pokeDex(DefendingPokemon,'Type 2',T2),
   nl(),
-  print(T2),
+ % print(T2),
   types(T1,AttackingType,V1),
   nl(),
-  print(V1),
+  %print(V1),
   types(T2,AttackingType,V2),
   nl(),
   print(V2),
