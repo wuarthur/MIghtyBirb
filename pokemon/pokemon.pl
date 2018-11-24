@@ -1,14 +1,14 @@
 :- use_module(library(apply)).
 :- use_module(library(csv)).
 :- dynamic pokeDex/3. pokeDex(num,col, value).
-:- dynamic moveSet/2. 
-:- dynamic moves/3. 
-:- dynamic types/3. 
+:- dynamic moveSet/2.
+:- dynamic moves/3.
+:- dynamic types/3.
 
 import:-load().
 load():-
   get_rows_data("movesetsNew.csv", [H|T]),
-  add_move(H, T),
+  add_MoveSet(H, T),
   get_rows_data("moves.csv", [H2|T2]),
   add_move(H2, T2),
   get_rows_data("types.csv", [H3|T3]),
@@ -25,7 +25,7 @@ recursive_type([],_, _).
 recursive_type([C1|Ct], [Val|T],Num):-
   nl(),
   print(types(Num,C1, Val)),
-  assert(types(Num,C1,Val)), 
+  assert(types(Num,C1,Val)),
   recursive_type(Ct,T, Num).
 
 
@@ -39,7 +39,7 @@ recursive_move(_,[],_).
 recursive_move(_,[''|_],_).
 recursive_move([],_, _).
 recursive_move([C1|Ct], [Val|T],Num):-
-  assert(moves(Num,C1,Val)), 
+  assert(moves(Num,C1,Val)),
   recursive_move(Ct,T, Num).
 
 %%%%%%%%%%%%
@@ -52,7 +52,7 @@ recursive_moveset(_,[],_).
 recursive_moveset(_,[''|_],_).
 recursive_moveset([],_, _).
 recursive_moveset([C1|Ct], [Val|T],Num):-
-  assert(moveSet(Num,Val)), 
+  assert(moveSet(Num,Val)),
   recursive_moveset(Ct,T, Num).
 
 
@@ -276,5 +276,3 @@ find_base_best_rating(P, Pbest, BestRating, Row, X):-
 
 %list is a list of strings containing only [Total,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed]
 %
-
-
