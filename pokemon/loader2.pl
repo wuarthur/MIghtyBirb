@@ -8,6 +8,7 @@
 load:-
   load_pokedex,
   load_att_types,
+  load_def_types,
   load_moves,
   load_moveset.
 
@@ -35,30 +36,34 @@ assertz_pokemon_type(Idx, Type):-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in attack type %% def CSV into KB
+load_def_types:-
+  assertz(defense_type('att', 'def')),
+  assertz(defense_type('sp_att', 'sp_def')).
+
 load_att_types:-
   csv_read_file("types.csv", [_|R]),
   maplist(assertz_attack_multi, R).
 
 assertz_attack_multi(Row):-
   Row = row(Attacking,Normal,Fire,Water,Electric,Grass,Ice,Fighting,Poison,Ground,Flying,Psychic,Bug,Rock,Ghost,Dragon,Dark,Steel,Fairy),
-  assert(attack(Attacking, 'Normal', Normal)),
-  assert(attack(Attacking, 'Fire', Fire)),
-  assert(attack(Attacking, 'Water', Water)),
-  assert(attack(Attacking, 'Electric', Electric)),
-  assert(attack(Attacking, 'Grass', Grass)),
-  assert(attack(Attacking, 'Ice', Ice)),
-  assert(attack(Attacking, 'Fighting', Fighting)),
-  assert(attack(Attacking, 'Poison', Poison)),
-  assert(attack(Attacking, 'Ground', Ground)),
-  assert(attack(Attacking, 'Flying', Flying)),
-  assert(attack(Attacking, 'Psychic', Psychic)),
-  assert(attack(Attacking, 'Bug', Bug)),
-  assert(attack(Attacking, 'Rock', Rock)),
-  assert(attack(Attacking, 'Ghost', Ghost)),
-  assert(attack(Attacking, 'Dragon', Dragon)),
-  assert(attack(Attacking, 'Dark', Dark)),
-  assert(attack(Attacking, 'Steel', Steel)),
-  assert(attack(Attacking, 'Fairy', Fairy)).
+  assertz(attack(Attacking, 'Normal', Normal)),
+  assertz(attack(Attacking, 'Fire', Fire)),
+  assertz(attack(Attacking, 'Water', Water)),
+  assertz(attack(Attacking, 'Electric', Electric)),
+  assertz(attack(Attacking, 'Grass', Grass)),
+  assertz(attack(Attacking, 'Ice', Ice)),
+  assertz(attack(Attacking, 'Fighting', Fighting)),
+  assertz(attack(Attacking, 'Poison', Poison)),
+  assertz(attack(Attacking, 'Ground', Ground)),
+  assertz(attack(Attacking, 'Flying', Flying)),
+  assertz(attack(Attacking, 'Psychic', Psychic)),
+  assertz(attack(Attacking, 'Bug', Bug)),
+  assertz(attack(Attacking, 'Rock', Rock)),
+  assertz(attack(Attacking, 'Ghost', Ghost)),
+  assertz(attack(Attacking, 'Dragon', Dragon)),
+  assertz(attack(Attacking, 'Dark', Dark)),
+  assertz(attack(Attacking, 'Steel', Steel)),
+  assertz(attack(Attacking, 'Fairy', Fairy)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in moveset into KB

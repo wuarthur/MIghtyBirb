@@ -1,6 +1,26 @@
 :- use_module(library(clpfd)).
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%  Presets, we gonna use Idx for everything.
+
+preset('preset name 1', [11, 22, 33, 44, 55, 66]).
+preset('preset name 2', [77, 88, 99, 2, 41, 23]).
+preset('preset name 3', [98, 13, 254, 45, 78, 25]).
+preset('preset name 4', [87, 76, 65, 54, 23, 12]).
+preset('preset name 5', [45, 123, 66, 78, 12, 66]).
+
+
+
+
+
+
+
 %%%%%%%%%%%% Finds according to stats
 %%%%%%%%%%%%%%%%% Try select_pokemons(1, 'False', ['hp', 'hp', 'tot'], Indices).
 %%%%%%%%%%%% Returns unique results
