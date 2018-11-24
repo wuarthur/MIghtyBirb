@@ -1,5 +1,42 @@
 :- use_module(library(apply)).
 :- use_module(library(csv)).
+:- dynamic pokeDex/3. pokeDex(num,col, value).
+
+import:-load().
+load():-  
+  get_rows_data("pokedex.csv", AllData),
+  add_to_db(AllData).
+
+
+add_to_db([]).
+add_to_db([H|T]):-
+  nth1(1, H, Num),
+  nth1(2, H, Name),
+  nth1(3, H, Type1),
+  nth1(4, H, Type2),
+  nth1(5, H, Total),
+  nth1(6, H, HP),
+  nth1(7, H, Attack),
+  nth1(8, H, Defense),
+  nth1(9, H, SpAtk),
+  nth1(10, H, SpDef),
+  nth1(11, H, Speed),
+  nth1(12, H, Generation),
+  nth1(13, H, Legendary),
+  assert(pokeDex(Num,'Name', Name)),
+  assert(pokeDex(Num,'Type1', Type1)),
+  assert(pokeDex(Num,'Type2', Type2)),
+  assert(pokeDex(Num,'Total', Total)),
+  assert(pokeDex(Num,'HP', HP)),
+  assert(pokeDex(Num,'Attack', Attack)),
+  assert(pokeDex(Num,'Defense', Defense)),
+  assert(pokeDex(Num,'SpAtk', SpAtk)),
+  assert(pokeDex(Num,'SpDef', SpDef)),
+  assert(pokeDex(Num,'Speed', Speed)),
+  assert(pokeDex(Num,'Generation', Generation)),
+  assert(pokeDex(Num,'Legendary', Legendary)),
+  add_to_db(T).
+
 
 % taken from https://stackoverflow.com/questions/23183662/prolog-parsing-a-csv-file
 get_rows_data(File, Lists):-
@@ -217,43 +254,3 @@ find_base_best_rating(P, Pbest, BestRating, Row, X):-
 %list is a list of strings containing only [Total,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed]
 %
 
-
-
-
-% TODO: generate KB so that we only get the csv files once
-      % pokedex takes 3 params (pokemon name, stat name, stat value)
-      % types takes 3 params (attack type, def type, value)
-      % moves takes 3 params (name, stat name, stat value)
-      % movesets takes 2 params (pokemon name, move name)
-% TODO: user IO interface (Probably from command line. see Poole's geography.pl)
-      % just make the basic frame for now, we will come up with the questions and possible interactions later
-% TODO: return a pokemon that takes X damage from an type or less
-      % ex. given a type, fire, and damage, 1, return a pokemon that takes less than 1 damage from fire
-% TODO??: get pokemon with highest total base stat ----Call get_best_pokemon with 'Total' as number 1 priority
-      % literally add all of the stats together and return highest
-% TODO??: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd) --Call get_best_pokemon
-      % make a general formula that takes an order in an array ex. ['hp','speed',A,B,C,D]
-      % then returns the pokemon from the list that has the highest hp, then if there is a tie, highest speed etc
-% TODO: specify the stat strategy (ex. 2 atk, 2 sp atk, 1 hp, 1 spd)
-      % given a list of strats (so the above would be ['atk','atk','spatk','spatk','hp','spd'])
-      % return a pokemon team of 6
-% TODO???: specify generation, takes in a number (for the generation)
-      % return a pokemon with a matching gen number
-      % we will specify gen 0 as all generations (no filtering) --use genX_only().
-% TODO: no legendaries + mythical pokemon
-      % check if pokemon is not legendary
-% TODO: rival teams (random, following strategy, hard coded -- ex. champion teams)
-      % start with hard coded ones first
-      % we will define the teams (probably in a csv or something)
-      % then do random
-      % randomly generate 6 pokemon. (allow for repeats???)
-      % then do strategy
-      % get the best 6 pokemon. start with 1, then check for type coverage (which weakenesses does it have), then do the 2nd one to cover those weakenesses
-      % (above formula is subject to change, idk the best way to generate pokemon teams)
-% TODO: find best match up for pokemon
-      % based on types. so we will find a counter pokemon for each rival pokemon
-% TODO: doubles
-      % 2 pokemon on a field at a time. idk if this is too similar to solo battles
-      % the only thing that's really affected are the moves it uses. might be put off
-% TODO: moves - find csv, generate strategies (ex. 1 heal, 1 spatk, 1 atk, 1 buff)
-      % DO THIS LAST
