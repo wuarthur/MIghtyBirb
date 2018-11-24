@@ -7,6 +7,7 @@
 
 import:-load().
 load():-
+  get_pokedex(),
   get_rows_data("movesetsNew.csv", [H|T]),
   add_MoveSet(H, T),
   get_rows_data("moves.csv", [H2|T2]),
