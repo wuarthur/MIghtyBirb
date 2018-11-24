@@ -5,8 +5,8 @@
 :- dynamic moves/3.
 :- dynamic types/3.
 
-import:-loadt().
-loadt():-
+
+loadt(Z):-
   get_rows_data("movesetsNew.csv", [[_|H]|T]),
   add_MoveSet(H, T),
   get_rows_data("moves.csv", [[_|H2]|T2]),
@@ -15,7 +15,6 @@ loadt():-
   add_types(H3, T3),
   get_rows_data("pokedex.csv", [[_|H4]|T4]),
   add_pokeDex(H4, T4).
-
 
 
 add_pokeDex(_, []).
@@ -90,4 +89,6 @@ damageMultiplier(DefendingPokemon, AttackingType, MultiplierValueBetween0and4) :
   types(AttackingType,T2,V2),
   MultiplierValueBetween0and4 is V1*V2.
 
-%damageMultiplier(DefendingPokemon, AttackingType, MultiplierValueBetween0and4)
+
+% autoload the kb
+:-loadt('hi').

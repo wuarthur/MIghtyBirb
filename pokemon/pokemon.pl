@@ -5,15 +5,15 @@
 :- dynamic moves/3.
 :- dynamic types/3.
 
-import:-load().
+:-load().
 load():-
-  get_rows_data("movesetsNew.csv", [H|T]),
+  get_rows_data("movesetsNew.csv", [[_|H]|T]),
   add_MoveSet(H, T),
-  get_rows_data("moves.csv", [H2|T2]),
+  get_rows_data("moves.csv", [[_|H2]|T2]),
   add_move(H2, T2),
-  get_rows_data("types.csv", [H3|T3]),
+  get_rows_data("types.csv", [[_|H3]|T3]),
   add_types(H3, T3),
-  get_rows_data("pokedex.csv", [H4|T4]),
+  get_rows_data("pokedex.csv", [[_|H4]|T4]),
   add_pokeDex(H4, T4).
 
 
@@ -24,15 +24,14 @@ add_pokeDex(Col, [[Num|H]|T]):-
   add_pokeDex(Col, T).
 
 recursive_dex(_,[],_).
-recursive_dex(_,[''|_],_).
 recursive_dex([],_, _).
 recursive_dex([C1|Ct], [Val|T],Num):-
-  nl(),
-  print(pokeDex(Num,C1, Val)),
+  %nl(),
+  %print(pokeDex(Num,C1, Val)),
   assert(pokeDex(Num,C1,Val)),
   recursive_dex(Ct,T, Num).
-%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%
 add_types(_, []).
 add_types(Col, [[Num|H]|T]):-
   recursive_type(Col, H, Num),
