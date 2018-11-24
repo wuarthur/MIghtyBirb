@@ -7,13 +7,31 @@
 
 import:-load().
 load():-
-  get_pokedex(),
   get_rows_data("movesetsNew.csv", [H|T]),
   add_MoveSet(H, T),
   get_rows_data("moves.csv", [H2|T2]),
   add_move(H2, T2),
   get_rows_data("types.csv", [H3|T3]),
-  add_types(H3, T3).
+  add_types(H3, T3),
+  get_rows_data("pokedex.csv", [H4|T4]),
+  add_pokeDex(H4, T4).
+
+
+
+add_pokeDex(_, []).
+add_pokeDex(Col, [[Num|H]|T]):-
+  recursive_dex(Col, H, Num),
+  add_pokeDex(Col, T).
+
+recursive_dex(_,[],_).
+recursive_dex(_,[''|_],_).
+recursive_dex([],_, _).
+recursive_dex([C1|Ct], [Val|T],Num):-
+  nl(),
+  print(pokeDex(Num,C1, Val)),
+  assert(pokeDex(Num,C1,Val)),
+  recursive_dex(Ct,T, Num).
+%%%%%%%%%%%%%%%%%%%%%%
 
 add_types(_, []).
 add_types(Col, [[Num|H]|T]):-
@@ -56,24 +74,7 @@ recursive_moveset([C1|Ct], [Val|T],Num):-
   assert(moveSet(Num,Val)),
   recursive_moveset(Ct,T, Num).
 
-get_pokedex() :-
-  get_rows_data("pokedex.csv", [_,H|T]),
-  add_pokeDex_to_db(H,T).
 
-add_pokeDex_to_db(row(Num,Name,Type1,Type2,Total,HP,Attack,Defense,SpAtk,SpDef,Speed,Gen,Legendary),[H|T]):-
-  assert(pokeDex(Num,'Name', Name)),
-  assert(pokeDex(Num,'Type1', Type1)),
-  assert(pokeDex(Num,'Type2', Type2)),
-  assert(pokeDex(Num,'Total', Total)),
-  assert(pokeDex(Num,'HP', HP)),
-  assert(pokeDex(Num,'Attack', Attack)),
-  assert(pokeDex(Num,'Defense', Defense)),
-  assert(pokeDex(Num,'SpAtk', SpAtk)),
-  assert(pokeDex(Num,'SpDef', SpDef)),
-  assert(pokeDex(Num,'Speed', Speed)),
-  assert(pokeDex(Num,'Generation', Gen)),
-  assert(pokeDex(Num,'Legendary', Legendary)),
-  add_pokeDex_to_db(H,T).
 
 
 

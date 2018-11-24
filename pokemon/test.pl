@@ -1,20 +1,38 @@
 :- use_module(library(apply)).
 :- use_module(library(csv)).
-:- dynamic pokeDex/3. pokeDex(num,col, value).
+:- dynamic pokeDex/3. 
 :- dynamic moveSet/2.
 :- dynamic moves/3.
 :- dynamic types/3.
 
-import:-load().
-load():-
-  get_pokedex(),
-  get_rows_data("movesetsNew.csv", [H|T]),
+import:-loadt().
+loadt():-
+  get_rows_data("movesetsNew.csv", [[_|H]|T]),
   add_MoveSet(H, T),
-  get_rows_data("moves.csv", [H2|T2]),
+  get_rows_data("moves.csv", [[_|H2]|T2]),
   add_move(H2, T2),
-  get_rows_data("types.csv", [H3|T3]),
-  add_types(H3, T3).
+  get_rows_data("types.csv", [[_|H3]|T3]),
+  add_types(H3, T3),
+  get_rows_data("pokedex.csv", [[_|H4]|T4]),
+  add_pokeDex(H4, T4).
 
+
+
+add_pokeDex(_, []).
+add_pokeDex(Col, [[Num|H]|T]):-
+  recursive_dex(Col, H, Num),
+  add_pokeDex(Col, T).
+
+recursive_dex(_,[],_).
+recursive_dex(_,[''|_],_).
+recursive_dex([],_, _).
+recursive_dex([C1|Ct], [Val|T],Num):-
+  nl(),
+  print(pokeDex(Num,C1, Val)),
+  assert(pokeDex(Num,C1,Val)),
+  recursive_dex(Ct,T, Num).
+
+%%%%%%%%%%%%%%%
 add_types(_, []).
 add_types(Col, [[Num|H]|T]):-
   recursive_type(Col, H, Num),
@@ -24,8 +42,6 @@ recursive_type(_,[],_).
 recursive_type(_,[''|_],_).
 recursive_type([],_, _).
 recursive_type([C1|Ct], [Val|T],Num):-
-  nl(),
-  print(types(Num,C1, Val)),
   assert(types(Num,C1,Val)),
   recursive_type(Ct,T, Num).
 
@@ -71,8 +87,19 @@ types(_,'',1).
 
 % get the damage multiplier a type of move would make to a pokemon
 damageMultiplier(DefendingPokemon, AttackingType, MultiplierValueBetween0and4) :-
-  pokeDex(DefendingPokemon,"Type1",T1),
-  pokeDex(DefendingPokemon,"Type2",T2),
+  print(DefendingPokemon),
+  pokeDex(DefendingPokemon,'Type 1',T1),
+  nl(),
+  print(T1),
+  pokeDex(DefendingPokemon,'Type 2',T2),
+  nl(),
+  print(T2),
   types(T1,AttackingType,V1),
+  nl(),
+  print(V1),
   types(T2,AttackingType,V2),
+  nl(),
+  print(V2),
   MultiplierValueBetween0and4 is V1*V2.
+
+%damageMultiplier(DefendingPokemon, AttackingType, MultiplierValueBetween0and4)
