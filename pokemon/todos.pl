@@ -7,10 +7,10 @@
       % just make the basic frame for now, we will come up with the questions and possible interactions later
 % TODO: return a pokemon that takes X damage from an type or less
       % ex. given a type, fire, and damage, 1, return a pokemon that takes less than 1 damage from fire
-      damageMultiplier(DefendingPokemon, AttackingType, MultiplierBetween0and4)
+      damageMultiplier(DefendingPokemon, AttackingType, MultiplierValueBetween0and4)
 % TODO: get pokemon with highest total base stat
       % literally add all of the stats together and return highest
-      highestTotalStat(Pokemon, Value)
+      totalBaseStat(Pokemon, Value)
 % TODO: get pokemon with highest stat1 > stat2 > stat3... (where stats = hp/atk/def/spatk/spdef/spd)
       % make a general formula that takes an order in an array ex. ['hp','speed',A,B,C,D]
       % then returns the pokemon from the list that has the highest hp, then if there is a tie, highest speed etc

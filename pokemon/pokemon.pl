@@ -3,7 +3,7 @@
 :- dynamic pokeDex/3. pokeDex(num,col, value).
 
 import:-load().
-load():-  
+load():-
   get_rows_data("pokedex.csv", AllData),
   add_to_db(AllData).
 
@@ -140,7 +140,7 @@ moves_factor(P, Pa, Points):-
 %   get_rows_data("movesetsNew.csv", [H,H2|T]),
 %   Moves is H2.
 
-typeX_only([], _, Acc, Ret):- 
+typeX_only([], _, Acc, Ret):-
   maplist(list_to_list, Acc, Ret).
 typeX_only([H|T], TypeX, Acc, Ret):-
   nth1(3, H, TypeX)->typeX_only(T, TypeX, [H|Acc], Ret);
@@ -253,4 +253,3 @@ find_base_best_rating(P, Pbest, BestRating, Row, X):-
 
 %list is a list of strings containing only [Total,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed]
 %
-
