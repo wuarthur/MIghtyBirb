@@ -40,7 +40,8 @@ calculate_stab(Att_move_idx, Att_pokemon_idx, Multiplier):-
   apply_stab(C, Multiplier).
 
 apply_stab(0, 1).
-apply_stab(_, 1.25).
+apply_stab(C, 1.25):-
+  C > 0.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,13 +53,13 @@ defense_category('Physical', 'def').
 defense_category('Special', 'sp_def').
 
 calculate_attack(Att_move_idx, Att_pokemon_idx, Attack):-
-  move(Att_move_idx ,'category', Att_category),
-  attack_category(Att_category, C),
-  pokemon(Att_move_idx, C, Defense).
+  move(Att_move_idx ,'category', Category),
+  attack_category(Category, C),
+  pokemon(Att_pokemon_idx, C, Attack).
 
 calculate_defense(Att_move_idx, Def_pokemon_idx, Defense):-
-  move(Att_move_idx ,'category', Att_category),
-  defense_category(Att_category, C),
+  move(Att_move_idx ,'category', Category),
+  defense_category(Category, C),
   pokemon(Def_pokemon_idx, C, Defense).
 
 
@@ -97,5 +98,5 @@ calculate_att(Att_pokemon_idx, Def_pokemon_idx, Att_move_idx, Damage):-
   calculate_attack(Att_move_idx, Att_pokemon_idx, Attack),
   calculate_defense(Att_move_idx, Def_pokemon_idx, Defense),
   calculate_stab(Att_move_idx, Att_pokemon_idx, Stab),
-  calculate_multiplier(Att_move_idx, Def_pokemon_Idx, Multiplier),
+  calculate_multiplier(Att_move_idx, Def_pokemon_idx, Multiplier),
   Damage is Attack * Stab * Multiplier - Defense.
