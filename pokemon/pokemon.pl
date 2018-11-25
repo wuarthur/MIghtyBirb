@@ -5,8 +5,8 @@
 :- dynamic moves/3.
 :- dynamic types/3.
 
-:-load().
-load():-
+
+load(Z):-
   get_rows_data("movesetsNew.csv", [[_|H]|T]),
   add_MoveSet(H, T),
   get_rows_data("moves.csv", [[_|H2]|T2]),
@@ -297,3 +297,5 @@ find_base_best_rating(P, Pbest, BestRating, Row, X):-
 
 %list is a list of strings containing only [Total,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed]
 %
+
+:-load('hi').
