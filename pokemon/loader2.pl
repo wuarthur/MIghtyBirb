@@ -67,14 +67,15 @@ pokemon(Idx, 'moveset', M):-
   M = moveset(Idx, _, _).
 
 load_moveset:-
-  csv_read_file("./csvs/movesets.csv", [_|B]),
+  csv_read_file("./csvs/movesetsNew.csv", [_|B]),
   maplist(assertz_moveset, B).
 
 assertz_moveset(Row):-
   Row =.. [row|Lst],
   Lst = [Idx, _, _| M],
   exclude(=(''), M, Moves),
-  maplist(asserts_moveset_move(Idx), Moves).
+  list_to_set(Moves, Moveset),
+  maplist(asserts_moveset_move(Idx), Moveset).
 
 asserts_moveset_move(Idx, Move):-
   assertz(pokemon(Idx, 'move', Move)).

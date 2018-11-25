@@ -16,11 +16,12 @@ preset('preset name 4', [87, 76, 65, 54, 23, 12]).
 preset('preset name 5', [45, 123, 66, 78, 12, 66]).
 
 
-%% Picks moves set for pokemon.
-default_moves(Idx, Move_idx_set):-
-  Move_idx_set is 2.
+%%%%%%%%%%% Picks default moves set for pokemon, 4 is max I think.
 
-
+default_moves(Idx, Move_indices):-
+  findall(M, pokemon(Idx, 'move', M), Moves),
+  random_permutation(Moves, M),
+  take(4, M, Move_indices).
 
 
 %%%%%%%%%%%% Finds according to stats

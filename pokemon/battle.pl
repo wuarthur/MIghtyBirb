@@ -18,8 +18,7 @@
 
 calculate_multiplier(Att_move_idx, Def_pokemon_Idx, Multiplier):-
   move(Att_move_idx, 'type', Att_type),
-  findall([S], pokemon(Def_pokemon_Idx, 'type', S), D),
-  flatten(D, Def_types),
+  findall(S, pokemon(Def_pokemon_Idx, 'type', S), Def_types),
   maplist(map_multiplier(Att_type), Def_types, M),
   flatten(M, Multipliers),
   product_list(Multipliers, Multiplier).
@@ -34,8 +33,7 @@ map_multiplier(Att_type, Def_type, Multiplier):-
 
 calculate_stab(Att_move_idx, Att_pokemon_idx, Multiplier):-
   move(Att_move_idx, 'type', Att_type),
-  findall([S], pokemon(Att_pokemon_idx, 'type', S), A),
-  flatten(A, Att_types),
+  findall(S, pokemon(Att_pokemon_idx, 'type', S), Att_types),
   count(Att_type, Att_types, C),
   apply_stab(C, Multiplier).
 

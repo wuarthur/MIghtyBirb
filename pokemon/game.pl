@@ -32,7 +32,7 @@
 %%%%%%%% Update KB to reflect change in active_pokemon stats.
 %%%%%%% TODO -- Only HP is affected? There is no buff && de/buff to change attack / def stats?
 
-update_hp(Idx, Stat, Diff):-
+update_stat(Idx, Stat, Diff):-
   active_pokemon(Idx, Stat, Old_value),
   New_value is Old_value + Diff,
   retract(active_pokemon(Idx, _, _)),
