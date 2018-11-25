@@ -9,7 +9,8 @@ load:-
   load_pokedex,
   load_att_types,
   load_moves,
-  load_moveset.
+  load_moveset,
+  load_presets.
 
 load_pokedex:-
   csv_read_file("./csvs/pokedex.csv", [_|R]),
@@ -98,3 +99,14 @@ assert_moves(M):-
   assertz(move(Id, 'z-effect', Z_effect)),
   assertz(move(Id, 'priority', Priority)),
   assertz(move(Id, 'crit', Crit)).
+
+
+load_presets:-
+    csv_read_file("./csvs/presets.csv", [_|B]),
+    maplist(assert_preset, B).
+
+
+assert_preset(Row):-
+  Row =.. [row|Lst],
+  Lst = [Idx, Name | Pokemon_indices],
+  assertz(preset(Idx, Name, Pokemon_indices)).
