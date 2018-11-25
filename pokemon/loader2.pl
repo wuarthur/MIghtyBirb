@@ -8,7 +8,6 @@
 load:-
   load_pokedex,
   load_att_types,
-  load_def_types,
   load_moves,
   load_moveset.
 
@@ -36,9 +35,6 @@ assertz_pokemon_type(Idx, Type):-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in attack type %% def CSV into KB
-load_def_types:-
-  assertz(defense_type('att', 'def')),
-  assertz(defense_type('sp_att', 'sp_def')).
 
 load_att_types:-
   csv_read_file("./csvs/types.csv", [_|R]),
@@ -91,13 +87,13 @@ load_moves:-
 
 assert_moves(M):-
   M = row(Id, Move, Desc, Type, Category, Power, Accuracy, PP, Z_effect, Priority, Crit),
-  assertz(moves(Id, 'move', Move)),
-  assertz(moves(Id, 'desc', Desc)),
-  assertz(moves(Id, 'type', Type)),
-  assertz(moves(Id, 'category', Category)),
-  assertz(moves(Id, 'power', Power)),
-  assertz(moves(Id, 'acc', Accuracy)),
-  assertz(moves(Id, 'pp', PP)),
-  assertz(moves(Id, 'z-effect', Z_effect)),
-  assertz(moves(Id, 'priority', Priority)),
-  assertz(moves(Id, 'crit', Crit)).
+  assertz(move(Id, 'move', Move)),
+  assertz(move(Id, 'desc', Desc)),
+  assertz(move(Id, 'type', Type)),
+  assertz(move(Id, 'category', Category)),
+  assertz(move(Id, 'power', Power)),
+  assertz(move(Id, 'acc', Accuracy)),
+  assertz(move(Id, 'pp', PP)),
+  assertz(move(Id, 'z-effect', Z_effect)),
+  assertz(move(Id, 'priority', Priority)),
+  assertz(move(Id, 'crit', Crit)).

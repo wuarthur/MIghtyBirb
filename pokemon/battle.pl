@@ -16,29 +16,52 @@
   3) multiply the values together
 */
 
-damage_multiplier(Att_Idx, Def_Idx, Multiplier):-
-  findall([S], pokemon(Att_Idx, 'type', S), A),
-  findall([S], pokemon(Def_Idx, 'type', S), D),
-  flatten(A, Att_types),
+calculate_multiplier(Att_move_idx, Def_pokemon_Idx, Multiplier):-
+  move(Att_move_idx, 'type', Att_type),
+  findall([S], pokemon(Def_pokemon_Idx, 'type', S), D),
   flatten(D, Def_types),
-  maplist(map_multipliers(Def_types), Att_types, M),
+  maplist(map_multiplier(Att_type), Def_types, M),
   flatten(M, Multipliers),
   product_list(Multipliers, Multiplier).
-
-map_multipliers(Def_types, Att_type, Multipliers):-
-  maplist(map_multiplier(Att_type), Def_types, Multipliers).
 
 map_multiplier(Att_type, Def_type, Multiplier):-
   attack(Att_type, Def_type, Multiplier).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Calculate STAB value to either 1 (no STAB) or 1.25 (STABBY)
+
+calculate_stab(Att_move_idx, Att_pokemon_idx, Multiplier):-
+  move(Att_move_idx, 'type', Att_type),
+  findall([S], pokemon(Att_pokemon_idx, 'type', S), A),
+  flatten(A, Att_types),
+  count(Att_type, Att_types, C),
+  apply_stab(C, Multiplier).
+
+apply_stab(0, 1).
+apply_stab(_, 1.25).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+attack_category('Physical', 'att').
+attack_category('Special', 'sp_att').
+defense_category('Physical', 'def').
+defense_category('Special', 'sp_def').
 
-%%%%%%%% TODO: -- I have no idea if this is right, never played pokemon
-%%%%%%%% Please tell me im not out of touch with reality and this is right
+calculate_attack(Att_move_idx, Att_pokemon_idx, Attack):-
+  move(Att_move_idx ,'category', Att_category),
+  attack_category(Att_category, C),
+  pokemon(Att_move_idx, C, Defense).
+
+calculate_defense(Att_move_idx, Def_pokemon_idx, Defense):-
+  move(Att_move_idx ,'category', Att_category),
+  defense_category(Att_category, C),
+  pokemon(Def_pokemon_idx, C, Defense).
+
+
 /*
   the damage depends on the move used
   so it must use calculate_move
@@ -70,38 +93,9 @@ map_multiplier(Att_type, Def_type, Multiplier):-
   6) take the floor of damage. if it's less than 1, return 1
 */
 
-calculate_att(Att_Idx, Def_Idx, Att_type, Damage):-
-  defense_type(Att_type, Def_Type),
-  pokemon(Att_Idx, Att_type, Att_value),
-  pokemon(Def_Idx, Def_Type, Def_value),
-  Raw_damage is Att_value - Def_value,
-  damage_multiplier(Att_Idx, Def_Idx, Multiplier),
-  Damage is Raw_damage * Multiplier.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%% TODO: --  Haha, not even gonna attempt this.
-/*
-  this is not needed
-*/
-
-calculate_move(Att_Idx, Def_Idx, Move, Damage).
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%% Update KB to reflect change in pokemon status.
-/*
-  this is only the change in hp right?
-*/
-
-update_stat(Idx, Stat, Diff):-
-  pokemon(Idx, Stat, Old_value),
-  New_value is Old_value + Diff,
-  retract(pokemon(Idx, Stat, _)),
-  assertz(pokemon(Idx, Stat, New_value)).
+calculate_att(Att_pokemon_idx, Def_pokemon_idx, Att_move_idx, Damage):-
+  calculate_attack(Att_move_idx, Att_pokemon_idx, Attack),
+  calculate_defense(Att_move_idx, Def_pokemon_idx, Defense),
+  calculate_stab(Att_move_idx, Att_pokemon_idx, Stab),
+  calculate_multiplier(Att_move_idx, Def_pokemon_Idx, Multiplier),
+  Damage is Attack * Stab * Multiplier - Defense.

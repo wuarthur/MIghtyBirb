@@ -17,11 +17,23 @@
     moveSet (maximum 4 moves, minimum 1 move. i dont know why anyone would have less than 4 but you can)
 */
 
-% battlemon(Id, 'idx', Idx).
-% battlemon(Id, 'affliction', 'rivial' | 'user').
-% battlemon(Id, 'move', Move_Id).
-% pokemon(Idx, 'battle_status', 'fainted' | 'ok').
+
+% active_pokemon(Id, 'idx', Idx).
+% active_pokemon(Id, 'affliction', 'rivial' | 'user').
+% active_pokemon(Id, 'move', Move_Id).
 
 
 
-%%%%%%%%% TODO next -- Pokemon team picking
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%% Update KB to reflect change in active_pokemon stats.
+%%%%%%% TODO -- Only HP is affected? There is no buff && de/buff to change attack / def stats?
+
+update_hp(Idx, Stat, Diff):-
+  active_pokemon(Idx, Stat, Old_value),
+  New_value is Old_value + Diff,
+  retract(active_pokemon(Idx, _, _)),
+  assertz(active_pokemon(Idx, Stat, New_value)).

@@ -16,7 +16,9 @@ preset('preset name 4', [87, 76, 65, 54, 23, 12]).
 preset('preset name 5', [45, 123, 66, 78, 12, 66]).
 
 
-
+%% Picks moves set for pokemon.
+default_moves(Idx, Move_idx_set):-
+  Move_idx_set is 2.
 
 
 
