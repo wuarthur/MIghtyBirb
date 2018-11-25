@@ -8,98 +8,121 @@
 load:-
   load_pokedex,
   load_att_types,
-  load_def_types,
   load_moves,
-  load_moveset.
+  load_moveset,
+  load_presets.
 
 load_pokedex:-
-  csv_read_file("pokedex.csv", [_|R]),
+  csv_read_file("./csvs/pokedex.csv", [_|R]),
   maplist(assertz_pokedex, R).
 
 assertz_pokedex(Row):-
   Row = row(Idx, Name, T1, T2, Tot, HP, Att, Def, SpAtt, SpDef, Speed, Generation, Legendary),
   exclude(=(''), [T1, T2], Types),
-  assertz(pokemon(Idx, 'name', Name)),
-  maplist(assertz_pokemon_type(Idx), Types),
-  assertz(pokemon(Idx, 'generation', Generation)),
-  assertz(pokemon(Idx, 'legendary', Legendary)),
-  assertz(pokemon(Idx, 'tot', Tot)),
-  assertz(pokemon(Idx, 'hp', HP)),
-  assertz(pokemon(Idx, 'att', Att)),
-  assertz(pokemon(Idx, 'def', Def)),
-  assertz(pokemon(Idx, 'sp_att', SpAtt)),
-  assertz(pokemon(Idx, 'sp_def', SpDef)),
-  assertz(pokemon(Idx, 'speed', Speed)).
+  Atoms = [
+    pokemon(Idx, 'name', Name),
+    pokemon(Idx, 'generation', Generation),
+    pokemon(Idx, 'legendary', Legendary),
+    pokemon(Idx, 'tot', Tot),
+    pokemon(Idx, 'hp', HP),
+    pokemon(Idx, 'att', Att),
+    pokemon(Idx, 'def', Def),
+    pokemon(Idx, 'sp_att', SpAtt),
+    pokemon(Idx, 'sp_def', SpDef),
+    pokemon(Idx, 'speed', Speed)
+  ],
+  maplist(assertz, Atoms),
+  maplist(assertz_pokemon_type(Idx), Types).
 
 assertz_pokemon_type(Idx, Type):-
   assertz(pokemon(Idx, 'type', Type)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in attack type %% def CSV into KB
-load_def_types:-
-  assertz(defense_type('att', 'def')),
-  assertz(defense_type('sp_att', 'sp_def')).
 
 load_att_types:-
-  csv_read_file("types.csv", [_|R]),
+  csv_read_file("./csvs/types.csv", [_|R]),
   maplist(assertz_attack_multi, R).
 
 assertz_attack_multi(Row):-
   Row = row(Attacking,Normal,Fire,Water,Electric,Grass,Ice,Fighting,Poison,Ground,Flying,Psychic,Bug,Rock,Ghost,Dragon,Dark,Steel,Fairy),
-  assertz(attack(Attacking, 'Normal', Normal)),
-  assertz(attack(Attacking, 'Fire', Fire)),
-  assertz(attack(Attacking, 'Water', Water)),
-  assertz(attack(Attacking, 'Electric', Electric)),
-  assertz(attack(Attacking, 'Grass', Grass)),
-  assertz(attack(Attacking, 'Ice', Ice)),
-  assertz(attack(Attacking, 'Fighting', Fighting)),
-  assertz(attack(Attacking, 'Poison', Poison)),
-  assertz(attack(Attacking, 'Ground', Ground)),
-  assertz(attack(Attacking, 'Flying', Flying)),
-  assertz(attack(Attacking, 'Psychic', Psychic)),
-  assertz(attack(Attacking, 'Bug', Bug)),
-  assertz(attack(Attacking, 'Rock', Rock)),
-  assertz(attack(Attacking, 'Ghost', Ghost)),
-  assertz(attack(Attacking, 'Dragon', Dragon)),
-  assertz(attack(Attacking, 'Dark', Dark)),
-  assertz(attack(Attacking, 'Steel', Steel)),
-  assertz(attack(Attacking, 'Fairy', Fairy)).
+  Atoms = [
+    attack(Attacking, 'Normal', Normal),
+    attack(Attacking, 'Fire', Fire),
+    attack(Attacking, 'Water', Water),
+    attack(Attacking, 'Electric', Electric),
+    attack(Attacking, 'Grass', Grass),
+    attack(Attacking, 'Ice', Ice),
+    attack(Attacking, 'Fighting', Fighting),
+    attack(Attacking, 'Poison', Poison),
+    attack(Attacking, 'Ground', Ground),
+    attack(Attacking, 'Flying', Flying),
+    attack(Attacking, 'Psychic', Psychic),
+    attack(Attacking, 'Bug', Bug),
+    attack(Attacking, 'Rock', Rock),
+    attack(Attacking, 'Ghost', Ghost),
+    attack(Attacking, 'Dragon', Dragon),
+    attack(Attacking, 'Dark', Dark),
+    attack(Attacking, 'Steel', Steel),
+    attack(Attacking, 'Fairy', Fairy)
+  ],
+  maplist(assertz, Atoms).
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in moves into KB
+load_moves:-
+  csv_read_file("./csvs/moves.csv", [_|B]),
+  exclude(is_status_move, B, M),
+  maplist(assert_moves, M).
+
+is_status_move(M):-
+  M = row(_, _,_, _, 'Status', _, _, _, _, _, _).
+
+assert_moves(M):-
+  M = row(Id, Move, Desc, Type, Category, Power, Accuracy, PP, Z_effect, Priority, Crit),
+  Atoms = [
+    move(Id, 'move', Move),
+    move(Id, 'desc', Desc),
+    move(Id, 'type', Type),
+    move(Id, 'category', Category),
+    move(Id, 'power', Power),
+    move(Id, 'acc', Accuracy),
+    move(Id, 'pp', PP),
+    move(Id, 'z-effect', Z_effect),
+    move(Id, 'priority', Priority),
+    move(Id, 'crit', Crit)
+  ],
+  maplist(assertz, Atoms).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in moveset into KB
 pokemon(Idx, 'moveset', M):-
   M = moveset(Idx, _, _).
 
 load_moveset:-
-  csv_read_file("movesets.csv", [_|B]),
-  maplist(assertz_moveset, B).
+  csv_read_file("./csvs/movesetsNew.csv", [_|B]),
+  findall(Idx, move(Idx, _, _), Moves),
+  list_to_set(Moves, Viable_set),
+  maplist(assertz_moveset(Viable_set), B).
 
-assertz_moveset(Row):-
+assertz_moveset(Viable_set, Row):-
   Row =.. [row|Lst],
-  Lst = [Idx, Species, Forme | M],
+  Lst = [Idx, _, _| M],
   exclude(=(''), M, Moves),
-  assertz(moveset(Idx, 'species', Species)),
-  assertz(moveset(Idx, 'forme', Forme)),
-  maplist(asserts_moveset_move(Idx), Moves).
+  list_to_set(Moves, Moveset),
+  intersection(Moveset, Viable_set, Reduced_set),
+  maplist(asserts_moveset_move(Idx), Reduced_set).
 
 asserts_moveset_move(Idx, Move):-
-  assertz(moveset(Idx, 'move', Move)).
+  assertz(pokemon(Idx, 'move', Move)).
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in moves into KB
-load_moves:-
-  csv_read_file("moves.csv", [_|B]),
-  maplist(assert_moves, B).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in Presets into KB
+load_presets:-
+    csv_read_file("./csvs/presets.csv", [_|B]),
+    maplist(assert_preset, B).
 
-assert_moves(M):-
-  M = row(Id, Move, Desc, Type, Category, Power, Accuracy, PP, Z_effect, Priority, Crit),
-  assertz(moves(Id, 'move', Move)),
-  assertz(moves(Id, 'desc', Desc)),
-  assertz(moves(Id, 'type', Type)),
-  assertz(moves(Id, 'category', Category)),
-  assertz(moves(Id, 'power', Power)),
-  assertz(moves(Id, 'acc', Accuracy)),
-  assertz(moves(Id, 'pp', PP)),
-  assertz(moves(Id, 'z-effect', Z_effect)),
-  assertz(moves(Id, 'priority', Priority)),
-  assertz(moves(Id, 'crit', Crit)).
+
+assert_preset(Row):-
+  Row =.. [row|Lst],
+  Lst = [Idx, Name | Pokemon_indices],
+  assertz(preset(Idx, Name, Pokemon_indices)).

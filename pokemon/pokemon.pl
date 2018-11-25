@@ -7,13 +7,13 @@
 
 
 load(Z):-
-  get_rows_data("movesetsNew.csv", [[_|H]|T]),
+  get_rows_data("./csvs/movesetsNew.csv", [[_|H]|T]),
   add_MoveSet(H, T),
-  get_rows_data("moves.csv", [[_|H2]|T2]),
+  get_rows_data("./csvs/moves.csv", [[_|H2]|T2]),
   add_move(H2, T2),
-  get_rows_data("types.csv", [[_|H3]|T3]),
+  get_rows_data("./csvs/types.csv", [[_|H3]|T3]),
   add_types(H3, T3),
-  get_rows_data("pokedex.csv", [[_|H4]|T4]),
+  get_rows_data("./csvs/pokedex.csv", [[_|H4]|T4]),
   add_pokeDex(H4, T4).
 
 

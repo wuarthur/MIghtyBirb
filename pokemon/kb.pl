@@ -12,7 +12,7 @@ get_rows_data(File, Rows):-
   maplist(assert, Rows).
 
 get_pokedex() :-
-  get_rows_data("pokedex.csv", [_,H|T]),
+  get_rows_data("./csvs/pokedex.csv", [_,H|T]),
   add_pokeDex_to_db(H,T).
 
 add_pokeDex_to_db(row(Num,Name,Type1,Type2,Total,HP,Attack,Defense,SpAtk,SpDef,Speed,Gen,Legendary),[H|T]):-
