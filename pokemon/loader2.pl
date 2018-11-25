@@ -76,14 +76,12 @@ load_moveset:-
 
 assertz_moveset(Row):-
   Row =.. [row|Lst],
-  Lst = [Idx, Species, Forme | M],
+  Lst = [Idx, _, _| M],
   exclude(=(''), M, Moves),
-  assertz(moveset(Idx, 'species', Species)),
-  assertz(moveset(Idx, 'forme', Forme)),
   maplist(asserts_moveset_move(Idx), Moves).
 
 asserts_moveset_move(Idx, Move):-
-  assertz(moveset(Idx, 'move', Move)).
+  assertz(pokemon(Idx, 'move', Move)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Loading in moves into KB

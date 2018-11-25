@@ -17,8 +17,10 @@
     moveSet (maximum 4 moves, minimum 1 move. i dont know why anyone would have less than 4 but you can)
 */
 
-active_pokemons('rival', []).
-active_pokemons('mine', []).
+% battlemon(Id, 'idx', Idx).
+% battlemon(Id, 'affliction', 'rivial' | 'user').
+% battlemon(Id, 'move', Move_Id).
+% pokemon(Idx, 'battle_status', 'fainted' | 'ok').
 
 
 
