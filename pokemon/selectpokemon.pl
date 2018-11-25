@@ -9,11 +9,11 @@
 
 %  Presets, we gonna use Idx for everything.
 
-preset('preset name 1', [11, 22, 33, 44, 55, 66]).
-preset('preset name 2', [77, 88, 99, 2, 41, 23]).
-preset('preset name 3', [98, 13, 254, 45, 78, 25]).
-preset('preset name 4', [87, 76, 65, 54, 23, 12]).
-preset('preset name 5', [45, 123, 66, 78, 12, 66]).
+preset(1, 'Carol Pick', [11, 22, 33, 44, 55, 66]).
+preset(2, 'Yi Pick', [77, 88, 99, 2, 41, 23]).
+preset(3, 'Hao Pick', [98, 13, 254, 45, 78, 25]).
+preset(4, 'preset name', [87, 76, 65, 54, 23, 12]).
+preset(5, 'preset name', [45, 123, 66, 78, 12, 66]).
 
 
 %%%%%%%%%%% Picks default moves set for pokemon, 4 is max I think.
@@ -23,6 +23,18 @@ default_moves(Idx, Move_indices):-
   random_permutation(Moves, M),
   take(4, M, Move_indices).
 
+
+
+%%%%%%%%%%%%%%%%% Pick 6 random pokemons :D
+
+random_pokemons(Generation, Legendary, Count, Indices):-
+  findall(Idx, (
+    pokemon(Idx, 'generation', Generation),
+    pokemon(Idx, 'legendary', Legendary)
+  ), Found),
+  list_to_set(Found, Found_set),
+  random_permutation(Found_set, I),
+  take(Count, I, Indices).
 
 %%%%%%%%%%%% Finds according to stats
 %%%%%%%%%%%%%%%%% Try select_pokemons(1, 'False', ['hp', 'hp', 'tot'], Indices).
@@ -52,7 +64,8 @@ select_pokemons_helper(Generation, Legendary, [Stat,Count], Indices):-
     pokemon(Idx, 'generation', Generation),
     pokemon(Idx, 'legendary', Legendary)
   ), Found),
-  predsort(compare_stat, Found, Sorted),
+  list_to_set(Found, Found_set),
+  predsort(compare_stat, Found_set, Sorted),
   reverse(Sorted, Reversed),
   take(Count, Reversed, Values),
   maplist(mapvalues, Values, Indices).

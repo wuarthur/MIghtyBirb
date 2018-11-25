@@ -2,7 +2,7 @@
 :- [loader2].
 :- [selectpokemon].
 :- [battle].
-
+:- [userio].
 
 
 %%%%%%%%% Easier to update KB if we use same 'active_pokemons' for both.
