@@ -71,16 +71,27 @@ clear_screen:-
 %%% Question Loop
 %%% Q is Question you want to ask
 %%% Opts is a list of options presented to user, must be pre formatted with \t or \n
+%%% We cant just write a new line because we have too many pokemons, need to display like 5 per line.
 %%% Ans is a list of args passed into Resolv fn, 1-1 relationship between Opt <-> Ans
 ask_user(Q, Opts, Ans, Resolv):-
   clear_screen,
   writef('%w\n', [Q]),
-  maplist(write, Opts),
+  add_number_prefix(Opts, O),
+  maplist(write, O),
   write('\n'),
   read(Input),
   Idx is Input - 1,
   nth0(Idx, Ans, A),
   call(Resolv, A).
+
+
+add_number_prefix(List, Prefixed):-
+  length(List, L),
+  findall(N, between(1, L, N), Nums),
+  maplist(concat_prefix, Nums, List, Prefixed).
+
+concat_prefix(N, S, R):-
+  swritef(R, '%w. %w', [N, S]).
 
 %% Example
 ask_q1:-
