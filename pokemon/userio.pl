@@ -123,7 +123,7 @@ concat_prefix(N, S, R):-
 save_q(Q, Opts, Ans, Resolv):-
   assertz(last_q(Q, Opts, Ans, Resolv)).
 save_q(Q, Opts, Ans, Resolv):-
-  retract(last_q(_, _, _, _)),
+  retractall(last_q(_, _, _, _)),
   assertz(last_q(Q, Opts, Ans, Resolv)).
 
 recover:-

@@ -30,14 +30,17 @@
 % ie 6 Pikachu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+:- dynamic active_pokemon/3.
+
 activate(Pokemon_idx, Affliction, Move_indices):-
   pokemon(Pokemon_idx, 'hp', HP),
-  find_idx(Id),
+  find_id(Id),
   Atoms = [
     active_pokemon(Id, 'pokemon_idx',Pokemon_idx),
     active_pokemon(Id, 'hp', HP),
     active_pokemon(Id, 'affliction', Affliction),
-    active_pokemon(Id, 'moves', Move_indices)
+    active_pokemon(Id, 'moves', Move_indices),
+    active_pokemon(Id, 'selected', false)
   ],
   maplist(assertz, Atoms).
 
@@ -46,6 +49,21 @@ find_id(Id):-
   findall(I, active_pokemon(I, 'pokemon_idx', _), Lst),
   length(Lst, Id).
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Select a pokemon of affliction : rival or user, deselect all other pokemons of same affliction
+
+select(Id):-
+  active_pokemon(1, 'affliction', Affliction),
+  findall(I, active_pokemon(I, 'affliction', Affliction), Ids),
+  maplist(deselect, Ids),
+  assertz(active_pokemon(Id, 'selected', true)).
+
+deselect(Id):-
+  retractall(active_pokemon(Id, 'selected', _)),
+  assertz(active_pokemon(Id, 'selected', false)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -69,5 +87,5 @@ hp_status(Hp, 'Fainted'):-
 update_stat(Idx, Stat, Diff):-
   active_pokemon(Idx, Stat, Old_value),
   New_value is Old_value + Diff,
-  retract(active_pokemon(Idx, _, _)),
+  retractall(active_pokemon(Idx, _, _)),
   assertz(active_pokemon(Idx, Stat, New_value)).
