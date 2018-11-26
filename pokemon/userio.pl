@@ -68,12 +68,14 @@ clear_screen:-
   maplist(write, Blank_lines).
 
 
+
 %%% Question Loop
 %%% Q is Question you want to ask
 %%% Opts is a list of options presented to user, must be pre formatted with \t or \n
 %%% We cant just write a new line because we have too many pokemons, need to display like 5 per line.
 %%% Ans is a list of args passed into Resolv fn, 1-1 relationship between Opt <-> Ans
 ask_user(Q, Opts, Ans, Resolv):-
+  save_q(Q, Opts, Ans, Resolv),
   clear_screen,
   writef('%w\n', [Q]),
   add_number_prefix(Opts, O),
@@ -110,6 +112,25 @@ add_number_prefix(List, Prefixed):-
 
 concat_prefix(N, S, R):-
   swritef(R, '%w. %w', [N, S]).
+
+
+%%%%%%%%%%%%%% Some errors dont seem to be catchable using the prologs catch/3.
+%%%%%%%%%%%%%% For example, if user input in only "." -> Syntax error: Unexpected end of clause
+%%%%%%%%%%%%%% Here is how you recover, call "recover."
+
+:- dynamic last_q/4.
+
+save_q(Q, Opts, Ans, Resolv):-
+  assertz(last_q(Q, Opts, Ans, Resolv)).
+save_q(Q, Opts, Ans, Resolv):-
+  retract(last_q(_, _, _, _)),
+  assertz(last_q(Q, Opts, Ans, Resolv)).
+
+recover:-
+  last_q(Q, Opts, Ans, Resolv),
+  ask_user(Q, Opts, Ans, Resolv).
+
+
 
 %% Example
 ask_q1:-
