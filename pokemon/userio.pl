@@ -69,6 +69,9 @@ clear_screen:-
 
 
 %%% Question Loop
+%%% Q is Question you want to ask
+%%% Opts is a list of options presented to user, must be pre formatted with \t or \n
+%%% Ans is a list of args passed into Resolv fn, 1-1 relationship between Opt <-> Ans
 ask_user(Q, Opts, Ans, Resolv):-
   clear_screen,
   writef('%w\n', [Q]),
@@ -87,3 +90,9 @@ ask_q1:-
     ['B\n', 'R\n', 'P\n'],
     write
   ).
+
+%% Write Q for picking a pokemon
+
+%% Write Q for using move in battle
+
+%% Write Q for
