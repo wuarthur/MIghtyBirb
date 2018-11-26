@@ -79,10 +79,28 @@ ask_user(Q, Opts, Ans, Resolv):-
   add_number_prefix(Opts, O),
   maplist(write, O),
   write('\n'),
+  parse_input(Ans, Resolv).
+
+parse_input(Ans, Resolv):-
   read(Input),
+  try_input(Input, Ans, Resolv).
+
+try_input(Input, Ans, Resolv):-
+  valid_input(Input, Ans),
   Idx is Input - 1,
   nth0(Idx, Ans, A),
   call(Resolv, A).
+
+try_input(Input, Ans, Resolv):-
+  not(valid_input(Input, Ans)),
+  write('Please try again with a valid selection\n'),
+  parse_input(Ans, Resolv).
+
+valid_input(Input, Ans):-
+  number(Input),
+  length(Ans, L),
+  Input >= 0,
+  Input < L.
 
 
 add_number_prefix(List, Prefixed):-

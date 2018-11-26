@@ -105,6 +105,7 @@ calculate_damage(Attack,Defense,Stab,Multiplier,Value) :-
   E is floor(D),
   ret_att(E, Value).
 
+
 calculate_att(Att_pokemon_idx, Def_pokemon_idx, Att_move_idx, Damage):-
   calculate_attack(Att_move_idx, Att_pokemon_idx, Attack),
   calculate_defense(Att_move_idx, Def_pokemon_idx, Defense),
