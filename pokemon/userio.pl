@@ -52,3 +52,38 @@
      player can either play again versus a new rival or change teams
 
 */
+
+
+
+%% We try to use only number keys as user input, instead of making them type
+%% pokemon names and such, since exact matches are hard.
+
+%% We list all possible user inputs and let them choose
+%% There will be no REDO step, we probably wont have time for it.
+
+
+% Run clear screen before next input function
+clear_screen:-
+  rep_list('\n', 100, Blank_lines),
+  maplist(write, Blank_lines).
+
+
+%%% Question Loop
+ask_user(Q, Opts, Ans, Resolv):-
+  clear_screen,
+  writef('%w\n', [Q]),
+  maplist(write, Opts),
+  write('\n'),
+  read(Input),
+  Idx is Input - 1,
+  nth0(Idx, Ans, A),
+  call(Resolv, A).
+
+%% Example
+ask_q1:-
+  ask_user(
+    'Hi there, whats your fav colour',
+    ['blue\n', 'red\n', 'purple\n'],
+    ['B\n', 'R\n', 'P\n'],
+    write
+  ).
