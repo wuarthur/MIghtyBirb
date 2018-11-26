@@ -92,9 +92,17 @@ calculate_defense(Att_move_idx, Def_pokemon_idx, Defense):-
   6) take the floor of damage. if it's less than 1, return 1
 */
 
+calculate_damage(_,_,_,0,1).
+calculate_damage(Attack,Defense,Stab,Multiplier,Value) :-
+  A is Attack/Defense,
+  B is A/50,
+  C is B+2,
+  D is C * Stab * Multiplier,
+  Value is floor(D).
+
 calculate_att(Att_pokemon_idx, Def_pokemon_idx, Att_move_idx, Damage):-
   calculate_attack(Att_move_idx, Att_pokemon_idx, Attack),
   calculate_defense(Att_move_idx, Def_pokemon_idx, Defense),
   calculate_stab(Att_move_idx, Att_pokemon_idx, Stab),
   calculate_multiplier(Att_move_idx, Def_pokemon_idx, Multiplier),
-  Damage is Attack * Stab * Multiplier - Defense.
+  calculate_damage(Attack,Defense,Stab,Multiplier,Damage).

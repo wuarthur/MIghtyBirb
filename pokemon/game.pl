@@ -64,6 +64,7 @@ hp_status(Hp, 'Fainted'):-
 
 %%%%%%%% Update KB to reflect change in active_pokemon stats.
 %%%%%%% TODO -- Only HP is affected? There is no buff && de/buff to change attack / def stats?
+%% NOTE: we are going to ignore status changes and buffs
 
 update_stat(Idx, Stat, Diff):-
   active_pokemon(Idx, Stat, Old_value),
