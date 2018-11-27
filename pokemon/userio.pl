@@ -74,6 +74,15 @@ clear_screen:-
 %%% Opts is a list of options presented to user, must be pre formatted with \t or \n
 %%% We cant just write a new line because we have too many pokemons, need to display like 5 per line.
 %%% Ans is a list of args passed into Resolv fn, 1-1 relationship between Opt <-> Ans
+/*
+  NOTE:
+  why is ans needed? why can't we just use opt
+  and how do you use resolv
+  cant you just make it
+  function:-
+    ask_user(Q,Ans),
+    resolv(Ans).
+*/
 ask_user(Q, Opts, Ans, Resolv):-
   save_q(Q, Opts, Ans, Resolv),
   clear_screen,
@@ -142,7 +151,28 @@ ask_q1:-
   ).
 
 %% Write Q for picking a pokemon
-
+intro_script:-
+  ask_user(
+    'Welcome to the pokemon battling lite.\n
+    Would you like to build a team themselves or have assistance?\n',
+    ['DIY\n','Help me\n'],
+    ['DIY\n','Help me\n'],
+    create_team %%TODO: this doesn't work
+  ).
+create_team('NoHelp'):-
+  ask_user(
+    'Choose a pokemon.\n',
+    ['Any\n','Stop\n'],
+    ['Any\n','Stop\n'],
+    write
+  ).
+create_team('Help'):-
+  ask_user(
+    'Random team or specify strategy?\n',
+    ['Random\n','Strategy\n'],
+    ['Random\n','Strategy\n'],
+    write
+  ).
 %% Write Q for using move in battle
 
 %% Write Q for

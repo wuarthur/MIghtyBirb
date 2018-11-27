@@ -38,3 +38,6 @@ especially since we are gonna be likely to change those up and they will get out
 impl of quite a few functions since I got the logic wrong.
 
 Also updated the battle.pl, so hopefully the logic is right now :)
+
+**Carol**
+left questions on userio
