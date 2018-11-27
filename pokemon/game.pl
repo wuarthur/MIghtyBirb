@@ -32,13 +32,14 @@
 
 :- dynamic active_pokemon/3.
 
-activate(Pokemon_idx, Affliction, Move_indices):-
+% Note NPC is true or false
+activate(Pokemon_idx, NPC, Move_indices):-
   pokemon(Pokemon_idx, 'hp', HP),
   find_id(Id),
   Atoms = [
     active_pokemon(Id, 'pokemon_idx',Pokemon_idx),
     active_pokemon(Id, 'hp', HP),
-    active_pokemon(Id, 'affliction', Affliction),
+    active_pokemon(Id, 'npc', NPC),
     active_pokemon(Id, 'moves', Move_indices),
     active_pokemon(Id, 'selected', false)
   ],
@@ -57,8 +58,8 @@ find_id(Id):-
 %% Battle between active pokemons
 
 select(Id):-
-  active_pokemon(1, 'affliction', Affliction),
-  findall(I, active_pokemon(I, 'affliction', Affliction), Ids),
+  active_pokemon(1, 'npc', NPC),
+  findall(I, active_pokemon(I, 'npc', NPC), Ids),
   maplist(deselect, Ids),
   assertz(active_pokemon(Id, 'selected', true)).
 

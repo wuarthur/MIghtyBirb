@@ -112,3 +112,16 @@ calculate_att(Att_pokemon_idx, Def_pokemon_idx, Att_move_idx, Damage):-
   calculate_stab(Att_move_idx, Att_pokemon_idx, Stab),
   calculate_multiplier(Att_move_idx, Def_pokemon_idx, Multiplier),
   calculate_damage(Attack,Defense,Stab,Multiplier,Damage).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Pick a best move for active pokemon
+
+best_move(Att_idx, Def_idx, Move_indices, Best_move):-
+  maplist(calculate_att(Att_idx, Def_idx), Move_indices, Damage_pts),
+  zip(Damage_pts, Move_indices, Zipped),
+  sort_zipped(Zipped, Sorted),
+  reverse(Sorted, Reversed),
+  Reversed = [Fst|_],
+  Fst = [_, Best_move].

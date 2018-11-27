@@ -20,3 +20,15 @@ product_list(List, Product):-
 
 foldl_product(Curr, Acc, Next):-
   Next is Curr * Acc.
+
+zip(X, Y, Z):-
+  maplist(zip_helper, X, Y, Z).
+
+zip_helper(X, Y, Z):-
+  Z = [X,Y].
+
+sort_zipped(S, Sorted):-
+  predsort(compare_zipped, S, Sorted).
+
+compare_zipped(R, [A, _], [B, _]):-
+  compare(R, A, B).
