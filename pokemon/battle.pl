@@ -125,3 +125,40 @@ best_move(Att_idx, Def_idx, Move_indices, Best_move):-
   reverse(Sorted, Reversed),
   Reversed = [Fst|_],
   Fst = [_, Best_move].
+
+
+
+
+
+%%%%%Weeeeeee
+
+pokemonState(Id, Hp).
+
+
+
+fight('f', _ ,Id2, Hp2, Id3, Hp3):-
+  print('2 won'),
+  Id3 is Id2,
+  Hp3 is Hp2.
+
+fight(Id1, Hp1 ,Id2, 0, Id3, Hp3):-
+  print('1 won'),
+  Id3 is Id1,
+  Hp3 is Hp1.
+%Id1: pokemon1 id 
+%Hp1: pokemon1's hp when fight begun
+%Id2: other pokemon2 id 
+%Hp2: pokemon2's hp when fight begun
+%Id3: winning pokemon id 
+%Hp3: remainging hp after the fight
+fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3):-
+  Hp2>0->
+    %todo reduce health base on move used instead of just 20
+    New1 is Hp1 - 20,
+    New1 > 0 -> 
+      %todo reduce health base on move used instead of just 20
+      New2 is Hp2 - 20,
+      fight(Id1, New1 ,Id2, New2, Id3, Hp3);
+  fight('f', _ ,Id2, Hp2, Id3, Hp3);
+  fight(Id1, Hp1 ,_, 0, Id3, Hp3).
+
