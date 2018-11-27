@@ -54,6 +54,7 @@ find_id(Id):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Select a pokemon of affliction : rival or user, deselect all other pokemons of same affliction
+%% Battle between active pokemons
 
 select(Id):-
   active_pokemon(1, 'affliction', Affliction),
@@ -89,3 +90,14 @@ update_stat(Idx, Stat, Diff):-
   New_value is Old_value + Diff,
   retractall(active_pokemon(Idx, _, _)),
   assertz(active_pokemon(Idx, Stat, New_value)).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Pick a random move for active pokemon
+
+random_move(Id, Move):-
+  active_pokemon(Id, 'moves', Move_indices),
+  random_permutation(Move_indices, Moves),
+  Moves = [Move|_ ].
