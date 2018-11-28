@@ -68,3 +68,25 @@ update_stat(Idx, Stat, Diff):-
   New_value is Old_value + Diff,
   retractall(active_pokemon(Idx, _, _)),
   assertz(active_pokemon(Idx, Stat, New_value)).
+
+
+
+
+
+%%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

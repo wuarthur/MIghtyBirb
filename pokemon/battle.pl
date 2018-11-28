@@ -1,4 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- use_module(moves).
 
 % Calculate type multiplier against a pokemon
 % each pokemon has 1 or 2 types, which have a different multiplier value against a type
@@ -123,3 +124,6 @@ fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3):-
       fight(Id1, New1 ,Id2, New2, Id3, Hp3);
   fight('f', _ ,Id2, Hp2, Id3, Hp3);
   fight(Id1, Hp1 ,_, 0, Id3, Hp3).
+
+test(ID, Moe):-
+  moves:random_move(ID, Moe).

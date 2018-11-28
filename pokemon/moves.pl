@@ -1,6 +1,7 @@
 %%%%%%%%%%% Picks default moves set for pokemon, 4 is max I think.
 % TODO: can this handle pokemon with movesets smaller than 4?
 % Ex: 132 has a moveset of 1
+:- module(moves, [random_move/2]).
 
 default_moves(Idx, Move_indices):-
   findall(M, pokemon(Idx, 'move', M), Moves),
