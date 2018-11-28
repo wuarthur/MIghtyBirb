@@ -111,7 +111,7 @@ valid_input(Input, Ans):-
   number(Input),
   length(Ans, L),
   Input >= 0,
-  Input < L.
+  Input =< L.
 
 
 add_number_prefix(List, Prefixed):-
@@ -159,14 +159,14 @@ intro_script:-
     ['DIY\n','Help me\n'],
     create_team %%TODO: this doesn't work
   ).
-create_team('NoHelp'):-
+create_team('DIY\n'):-
   ask_user(
     'Choose a pokemon.\n',
     ['Any\n','Stop\n'],
     ['Any\n','Stop\n'],
     write
   ).
-create_team('Help'):-
+create_team('Help me\n'):-
   ask_user(
     'Random team or specify strategy?\n',
     ['Random\n','Strategy\n'],

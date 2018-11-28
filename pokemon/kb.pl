@@ -78,7 +78,7 @@ assert_moves(M):-
     move(Id, 'move', Move),
     move(Id, 'type', Type),
     move(Id, 'category', Category),
-    move(Id, 'power', Power),
+    move(Id, 'power', Power)
   ],
   maplist(assertz, Atoms).
 
