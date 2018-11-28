@@ -1,9 +1,3 @@
-
-
-%%%%%%%%%%%%%%% Load V1 is kind crap, V2 is all triples.
-%%%%%%%%%%%%%% Ironically V1 took much longer to write :|
-
-
 %%%%%%%%%%%%%%%%%%%%%%%% Load all the CSV data.
 load:-
   load_pokedex,
@@ -79,18 +73,12 @@ is_status_move(M):-
   M = row(_, _,_, _, 'Status', _, _, _, _, _, _).
 
 assert_moves(M):-
-  M = row(Id, Move, Desc, Type, Category, Power, Accuracy, PP, Z_effect, Priority, Crit),
+  M = row(Id, Move, _, Type, Category, Power, _, _, _, _, _),
   Atoms = [
     move(Id, 'move', Move),
-    move(Id, 'desc', Desc),
     move(Id, 'type', Type),
     move(Id, 'category', Category),
     move(Id, 'power', Power),
-    move(Id, 'acc', Accuracy),
-    move(Id, 'pp', PP),
-    move(Id, 'z-effect', Z_effect),
-    move(Id, 'priority', Priority),
-    move(Id, 'crit', Crit)
   ],
   maplist(assertz, Atoms).
 

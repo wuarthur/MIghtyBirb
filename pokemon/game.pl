@@ -4,26 +4,24 @@
 :- [battle].
 :- [userio].
 
-
-%%%%%%%%% Easier to update KB if we use same 'active_pokemons' for both.
-%%%%%%% We probably gonna use Idx for active pokemons, and update their health via DB as in battle.pl
-%%%%%%% less "INNTER LEFT JOIN" that way.
-
-/*
-  each pokemon in the array will have a:
-    id to allow the same pokemon to appear multiple times
-    pokedex number
-    current hp
-    moveSet (maximum 4 moves, minimum 1 move. i dont know why anyone would have less than 4 but you can)
-*/
-
-
-% active_pokemon(Id, 'pokemon_idx', Idx).
-% active_pokemon(Id, 'affliction', 'rivial' | 'user').
-% active_pokemon(Id, 'moves', [Move_Id]).
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Game states
+
+game_state('Choosing teams'):- \+ you_still_have_pokemon, \+ npc_still_has_pokemon.
+game_state('Battling'):- you_still_have_pokemon, npc_still_has_pokemon.
+game_state('You win'):- you_still_have_pokemon, \+ npc_still_has_pokemon.
+game_state('You lose'):- \+ you_still_have_pokemon, npc_still_has_pokemon.
+
+you_still_have_pokemon:-
+  active_pokemon(Id, 'NPC', false),
+  active_pokemon(Id, 'hp', Hp),
+  Hp > 0.
+
+npc_still_has_pokemon:-
+  active_pokemon(Id, 'NPC', true),
+  active_pokemon(Id, 'hp', Hp),
+  Hp > 0.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %  We use active_pokemon here because we need to handle possible duplicate pokemons
@@ -41,7 +39,7 @@ activate(Pokemon_idx, NPC, Move_indices):-
     active_pokemon(Id, 'hp', HP),
     active_pokemon(Id, 'npc', NPC),
     active_pokemon(Id, 'moves', Move_indices),
-    active_pokemon(Id, 'selected', false)
+    active_pokemon(Id, 'in battle', false)
   ],
   maplist(assertz, Atoms).
 
@@ -61,11 +59,11 @@ select(Id):-
   active_pokemon(1, 'npc', NPC),
   findall(I, active_pokemon(I, 'npc', NPC), Ids),
   maplist(deselect, Ids),
-  assertz(active_pokemon(Id, 'selected', true)).
+  assertz(active_pokemon(Id, 'in battle', true)).
 
 deselect(Id):-
-  retractall(active_pokemon(Id, 'selected', _)),
-  assertz(active_pokemon(Id, 'selected', false)).
+  retractall(active_pokemon(Id, 'in battle', _)),
+  assertz(active_pokemon(Id, 'in battle', false)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
