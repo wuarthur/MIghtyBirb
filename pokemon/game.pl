@@ -1,6 +1,7 @@
 :- [utils].
-:- [loader2].
-:- [selectpokemon].
+:- [kb].
+:- [team].
+:- [moves].
 :- [battle].
 :- [userio].
 
@@ -23,37 +24,15 @@ npc_still_has_pokemon:-
   Hp > 0.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%  We use active_pokemon here because we need to handle possible duplicate pokemons
-% ie 6 Pikachu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-:- dynamic active_pokemon/3.
-
-% Note NPC is true or false
-activate(Pokemon_idx, NPC, Move_indices):-
-  pokemon(Pokemon_idx, 'hp', HP),
-  find_id(Id),
-  Atoms = [
-    active_pokemon(Id, 'pokemon_idx',Pokemon_idx),
-    active_pokemon(Id, 'hp', HP),
-    active_pokemon(Id, 'npc', NPC),
-    active_pokemon(Id, 'moves', Move_indices),
-    active_pokemon(Id, 'in battle', false)
-  ],
-  maplist(assertz, Atoms).
+/*
+ NOTE: what is select and deselect for?
+ also what is status for?
+*/
 
 
-find_id(Id):-
-  findall(I, active_pokemon(I, 'pokemon_idx', _), Lst),
-  length(Lst, Id).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% Select a pokemon of affliction : rival or user, deselect all other pokemons of same affliction
-%% Battle between active pokemons
+%% Select a pokemon of affliction : rival or user, deselect all other pokemon of same affliction
+%% Battle between active pokemon
 
 select(Id):-
   active_pokemon(1, 'npc', NPC),
@@ -89,14 +68,3 @@ update_stat(Idx, Stat, Diff):-
   New_value is Old_value + Diff,
   retractall(active_pokemon(Idx, _, _)),
   assertz(active_pokemon(Idx, Stat, New_value)).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Pick a random move for active pokemon
-
-random_move(Id, Move):-
-  active_pokemon(Id, 'moves', Move_indices),
-  random_permutation(Move_indices, Moves),
-  Moves = [Move|_ ].

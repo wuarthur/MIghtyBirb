@@ -72,7 +72,7 @@ clear_screen:-
 %%% Question Loop
 %%% Q is Question you want to ask
 %%% Opts is a list of options presented to user, must be pre formatted with \t or \n
-%%% We cant just write a new line because we have too many pokemons, need to display like 5 per line.
+%%% We cant just write a new line because we have too many pokemon, need to display like 5 per line.
 %%% Ans is a list of args passed into Resolv fn, 1-1 relationship between Opt <-> Ans
 /*
   NOTE:
