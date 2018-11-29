@@ -4,7 +4,8 @@ load:-
   load_att_types,
   load_moves,
   load_moveset,
-  load_presets.
+  load_presets,
+  load_initial_strategies.
 
 load_pokedex:-
   csv_read_file("./csvs/pokedex.csv", [_|R]),
@@ -114,3 +115,12 @@ assert_preset(Row):-
   Row =.. [row|Lst],
   Lst = [Idx, Name | Pokemon_indices],
   assertz(preset(Idx, Name, Pokemon_indices)).
+
+
+load_initial_strategies:-
+  Atoms = [
+    strategy_parameters('type','any'),
+    strategy_parameters('legendary','no'),
+    strategy_parameters('generation','any')
+  ],
+  maplist(assertz, Atoms).

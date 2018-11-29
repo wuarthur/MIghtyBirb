@@ -9,9 +9,10 @@
 :- dynamic active_pokemon/3.
 
 % Note NPC is true or false
-activate(Pokemon_idx, NPC, Move_indices):-
+activate(NPC, Pokemon_idx):-
   pokemon(Pokemon_idx, 'hp', HP),
   generate_id(Id),
+  default_moves(Pokemon_idx, Move_indices),
   Atoms = [
     active_pokemon(Id, 'pokemon_idx',Pokemon_idx),
     active_pokemon(Id, 'hp', HP),
