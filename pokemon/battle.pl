@@ -140,14 +140,16 @@ fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3, V):-
 %Pokemon indexes
 %returns:
 %Active_pokemon id of winner
+
 pvp(Id1, Id2, P1, P2, Winner):-
-  pokemon(P1, 'hp', HP1),
-  pokemon(P2, 'hp', HP2),
+  active_pokemon(Id1, hp, HP1),
+  active_pokemon(Id2, hp, HP2),
   fight(P1, HP1, P2, HP2, Wonner, HP, Won),
   pokemon(Wonner, 'name', Name),
   print("Winner is "),
   print(Won),
-  Won == 2 -> Winner = Id2;
+  Won == 2 -> retract(active_pokemon(Id1,_,_)),Winner = Id2;
+  retract(active_pokemon(Id2,_,_)),
   Winner = Id1.
 
 getMove(Pid, Move):-
