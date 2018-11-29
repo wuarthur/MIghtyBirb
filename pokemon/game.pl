@@ -1,7 +1,6 @@
 :- [utils].
 :- [kb].
 :- [team].
-:- [moves].
 % :- [battle].
 :- [userio].
 :- [script].
@@ -80,9 +79,7 @@ update_stat(Idx, Stat, Diff):-
 %%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 default_moves(Idx, Move_indices):-
-  findall(M, pokemon(Idx, 'move', M), Moves),
-  random_permutation(Moves, M),
-  take(4, M, Move_indices).
+  findall(M, pokemon(Idx, 'move', M), Move_indices).
 
 
 % Pick a random move for active pokemon

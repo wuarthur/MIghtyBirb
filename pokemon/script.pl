@@ -1,47 +1,12 @@
 start:-
+  retractall(active_pokemon(_,_,_)),
   ask_user(
     'Welcome to the pokemon battling lite.\n
-    Would you like to build a team yourself or have assistance?\n',
-    ['DIY\n','Help me\n'],
-    ['DIY','help'],
-    create_team
-  ).
-
-%%% DIY
-create_team('DIY'):-
-  can_still_add_pokemon_to_team,
-  findall(Idx, pokemon(Idx, 'name', _), List),
-  getPokemonNames(ListOfNames, List),
-  append(ListOfNames, ['any\t\t','stop'],L1),
-  append(List, ['any','stop'],L2),
-  ask_user(
-    'Choose a pokemon.\n',
-    L1,
-    L2,
-    add_to_team
-  ).
-create_team(help):-
-  ask_user(
-    'Random team or specify strategy?\n',
+    Would you like to build a random team or use a specify strategy?\n',
     ['Random\n','Strategy\n'],
     ['random','strategy'],
     generate_full_team
   ).
-
-%%% For DIY
-%%% add one pokemon at a time
-add_to_team(stop):-
-  generate_rival_team.
-add_to_team(any):-
-  can_still_add_pokemon_to_team,
-  random_pokemon(_,_,1,[H|_]),
-  activate(false, H).
-add_to_team(N):-
-  can_still_add_pokemon_to_team,
-  pokemon(N, _, _),
-  activate(false, N).
-
-
 
 %%% AI
 %%% create a team of pokemon
@@ -50,7 +15,12 @@ generate_full_team(random):-
   list_to_set(ListOfPokemon, Found_set),
   random_permutation(Found_set, I),
   take(6, I, Indices),
-  maplist(activate_my_pokemon, Indices).
+  maplist(activate_my_pokemon, Indices),
+  getPokemonNames(LN, Indices),
+  print("Your team:"),
+  nl(),
+  print(LN),
+  generate_rival_team.
 
 generate_full_team(strategy):-
   strategy_parameters('type',Type),
@@ -98,12 +68,13 @@ modify_strategy(generation):-
 
 modify_strategy(done):-
   strategy_parameters('type',Type),
+  get_gen_or_type_value(Type, T),
   strategy_parameters('legendary',Legend),
   get_legend_value(Legend, L),
   strategy_parameters('generation',Gen),
-  get_gen_value(Gen, G),
+  get_gen_or_type_value(Gen, G),
   findall(Idx, (
-    pokemon(Idx, 'type', Type),
+    pokemon(Idx, 'type', T),
     pokemon(Idx, 'legendary', L),
     pokemon(Idx, 'generation', G)
     ), List
@@ -112,6 +83,10 @@ modify_strategy(done):-
   random_permutation(Found_set, I),
   take(6, I, Indices),
   maplist(activate_my_pokemon, Indices),
+  getPokemonNames(LN, Indices),
+  print("Your team:"),
+  nl(),
+  print(LN),
   generate_rival_team.
 
 
@@ -120,7 +95,12 @@ generate_rival_team:-
   list_to_set(ListOfPokemon, Found_set),
   random_permutation(Found_set, I),
   take(6, I, Indices),
-  maplist(activate_npc_pokemon, Indices)
+  maplist(activate_npc_pokemon, Indices),
+  getPokemonNames(LN, Indices),
+  nl(),
+  print("Rival's team:"),
+  nl(),
+  print(LN)
   %TODO: add battle trigger here
   .
 
@@ -138,26 +118,7 @@ getPokemonNames(ListOfNames, List):-
   maplist(getName, List, ListOfNames).
 
 getName(Index, Name):-
-  pokemon(Index, 'name', N),
-  Mod is Index mod 5,
-  det_if_nl(Mod, Bool),
-  display_name(N, Name, Bool).
-
-det_if_nl(Mod, true):-
-  0 == Mod.
-det_if_nl(Mod, false):-
-  0 < Mod.
-
-display_name(Name, RetName, true):-
-  add_nl(Name, RetName).
-
-display_name(Name, RetName, false):-
-  atom_concat(Name, '\t\t', RetName).
-
-can_still_add_pokemon_to_team :-
-  findall(I, active_pokemon(I, npc, false), Lst),
-  length(Lst, Len),
-  Len < 6.
+  pokemon(Index, 'name', Name).
 
 activate_npc_pokemon(Pokemon):-
   activate(true,Pokemon).
@@ -171,12 +132,12 @@ add_to_string([H|T], String, FullString):-
   add_to_string(T, X, FullString).
 
 updateKb(ChangedName, ChangedValue):-
-  retract(strategy_parameters(ChangedName, _)),
+  retractall(strategy_parameters(ChangedName, _)),
   assertz(strategy_parameters(ChangedName, ChangedValue)),
   generate_full_team(strategy).
 
 get_legend_value(allow, _).
 get_legend_value(no, 'False').
 get_legend_value(only, 'True').
-get_gen_value(any, _).
-get_gen_value(N,N):- N \= any.
+get_gen_or_type_value(any, _).
+get_gen_or_type_value(N,N):- N \= any.
