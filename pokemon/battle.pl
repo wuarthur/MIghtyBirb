@@ -99,17 +99,19 @@ pokemonState(Id, Hp).
 
 
 
-fight('f', _ ,Id2, Hp2, Id3, Hp3):-
+fight('f', _ ,Id2, Hp2, Id3, Hp3,V):-
   print('2 won'),
   nl(),
   Id3 is Id2,
-  Hp3 is Hp2.
+  Hp3 is Hp2,
+  V is 2.
 
-fight(Id1, Hp1 ,Id2, 0, Id3, Hp3):-
+fight(Id1, Hp1 ,Id2, 0, Id3, Hp3,V):-
   print('1 won'),
   nl(),
   Id3 is Id1,
-  Hp3 is Hp1.
+  Hp3 is Hp1,
+  V is 1.
 
 
   
@@ -119,9 +121,9 @@ fight(Id1, Hp1 ,Id2, 0, Id3, Hp3):-
 %Hp2: pokemon2's hp when fight begun
 %Id3: winning pokemon id
 %Hp3: remainging hp after the fight
-fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3):-
+fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3, V):-
     Hp2 < 0 ->
-    fight(Id1, Hp1 ,_, 0, Id3, Hp3);
+    fight(Id1, Hp1 ,_, 0, Id3, Hp3, V);
     getMove(Id2, Move2),
     calculate_att(9, 1, Move2, Dmg1),
     New1 is Hp1 - Dmg1,
@@ -129,16 +131,24 @@ fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3):-
       getMove(Id1, Move1),
     calculate_att(9, 1, Move1, Dmg2),
       New2 is Hp2 - Dmg2,
-      fight(Id1, New1 ,Id2, New2, Id3, Hp3);
-    fight('f', _ ,Id2, Hp2, Id3, Hp3).
+      fight(Id1, New1 ,Id2, New2, Id3, Hp3 ,V );
+    fight('f', _ ,Id2, Hp2, Id3, Hp3, V).
 
-pvp(P1, P2, Winner):-
+%pokemon 1v1
+%Requires:
+%Active_pokemon ids
+%Pokemon indexes
+%returns:
+%Active_pokemon id of winner
+pvp(Id1, Id2, P1, P2, Winner):-
   pokemon(P1, 'hp', HP1),
   pokemon(P2, 'hp', HP2),
-  fight(P1, HP1, P2, HP2, Winner, HP),
-  pokemon(Winner, 'name', Name),
+  fight(P1, HP1, P2, HP2, Wonner, HP, Won),
+  pokemon(Wonner, 'name', Name),
   print("Winner is "),
-  print(Name).
+  print(Won),
+  Won == 2 -> Winner = Id2;
+  Winner = Id1.
 
 getMove(Pid, Move):-
   pokemon(Pid, 'move', Move).
