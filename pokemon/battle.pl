@@ -142,8 +142,8 @@ fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3, V):-
 %Active_pokemon id of winner
 
 pvp(Id1, Id2, P1, P2, Winner):-
-  active_pokemon(Id1, hp, HP1),
-  active_pokemon(Id2, hp, HP2),
+  active_pokemon(Id1, 'hp', HP1),
+  active_pokemon(Id2, 'hp', HP2),
   fight(P1, HP1, P2, HP2, Wonner, HP, Won),
   pokemon(Wonner, 'name', Name),
   print("Winner is "),
