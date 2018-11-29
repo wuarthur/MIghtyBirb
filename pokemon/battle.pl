@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- use_module(moves).
+:- [game].
 
 % Calculate type multiplier against a pokemon
 % each pokemon has 1 or 2 types, which have a different multiplier value against a type
@@ -101,13 +101,18 @@ pokemonState(Id, Hp).
 
 fight('f', _ ,Id2, Hp2, Id3, Hp3):-
   print('2 won'),
+  nl(),
   Id3 is Id2,
   Hp3 is Hp2.
 
 fight(Id1, Hp1 ,Id2, 0, Id3, Hp3):-
   print('1 won'),
+  nl(),
   Id3 is Id1,
   Hp3 is Hp1.
+
+
+  
 %Id1: pokemon1 id
 %Hp1: pokemon1's hp when fight begun
 %Id2: other pokemon2 id
@@ -115,15 +120,25 @@ fight(Id1, Hp1 ,Id2, 0, Id3, Hp3):-
 %Id3: winning pokemon id
 %Hp3: remainging hp after the fight
 fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3):-
-  Hp2>0->
-    %todo reduce health base on move used instead of just 20
-    New1 is Hp1 - 20,
+    Hp2 < 0 ->
+    fight(Id1, Hp1 ,_, 0, Id3, Hp3);
+    getMove(Id2, Move2),
+    calculate_att(9, 1, Move2, Dmg1),
+    New1 is Hp1 - Dmg1,
     New1 > 0 ->
-      %todo reduce health base on move used instead of just 20
-      New2 is Hp2 - 20,
+      getMove(Id1, Move1),
+    calculate_att(9, 1, Move1, Dmg2),
+      New2 is Hp2 - Dmg2,
       fight(Id1, New1 ,Id2, New2, Id3, Hp3);
-  fight('f', _ ,Id2, Hp2, Id3, Hp3);
-  fight(Id1, Hp1 ,_, 0, Id3, Hp3).
+    fight('f', _ ,Id2, Hp2, Id3, Hp3).
 
-test(ID, Moe):-
-  moves:random_move(ID, Moe).
+pvp(P1, P2, Winner):-
+  pokemon(P1, 'hp', HP1),
+  pokemon(P2, 'hp', HP2),
+  fight(P1, HP1, P2, HP2, Winner, HP),
+  pokemon(Winner, 'name', Name),
+  print("Winner is "),
+  print(Name).
+
+getMove(Pid, Move):-
+  pokemon(Pid, 'move', Move).

@@ -87,7 +87,7 @@ pokemon(Idx, 'moveset', M):-
   M = moveset(Idx, _, _).
 
 load_moveset:-
-  csv_read_file("./csvs/movesetsNew.csv", [_|B]),
+  csv_read_file("./csvs/movesetNewest.csv", [_|B]),
   findall(Idx, move(Idx, _, _), Moves),
   list_to_set(Moves, Viable_set),
   maplist(assertz_moveset(Viable_set), B).

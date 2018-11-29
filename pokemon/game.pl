@@ -2,12 +2,13 @@
 :- [kb].
 :- [team].
 :- [moves].
-:- [battle].
+% :- [battle].
 :- [userio].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Game states
 
+:-kb:load().
 game_state('Choosing teams'):- \+ you_still_have_pokemon, \+ npc_still_has_pokemon.
 game_state('Battling'):- you_still_have_pokemon, npc_still_has_pokemon.
 game_state('You win'):- you_still_have_pokemon, \+ npc_still_has_pokemon.
@@ -77,7 +78,18 @@ update_stat(Idx, Stat, Diff):-
 %%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+default_moves(Idx, Move_indices):-
+  findall(M, pokemon(Idx, 'move', M), Moves),
+  random_permutation(Moves, M),
+  take(4, M, Move_indices).
 
+
+% Pick a random move for active pokemon
+
+random_move(Id, Move):-
+  active_pokemon(Id, 'moves', Move_indices),
+  random_permutation(Move_indices, Moves),
+  Moves = [Move|_ ].
 
 
 
