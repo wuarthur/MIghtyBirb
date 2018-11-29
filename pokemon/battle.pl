@@ -148,8 +148,9 @@ pvp(Id1, Id2, P1, P2, Winner):-
   pokemon(Wonner, 'name', Name),
   print("Winner is "),
   print(Won),
-  Won == 2 -> retract(active_pokemon(Id1,_,_)),Winner = Id2;
+  Won == 2 -> retract(active_pokemon(Id1,_,_)), update_stat(Id2, 'hp',HP),Winner = Id2;
   retract(active_pokemon(Id2,_,_)),
+  update_stat(Id1, 'hp',HP),
   Winner = Id1.
 
 getMove(Pid, Move):-
