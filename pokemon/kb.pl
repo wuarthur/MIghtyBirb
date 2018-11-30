@@ -1,11 +1,30 @@
 %%%%%%%%%%%%%%%%%%%%%%%% Load all the CSV data.
+:- dynamic preset/2.
+
 load:-
+  preset,
   load_pokedex,
   load_att_types,
   load_moves,
   load_moveset,
-  load_presets,
   load_initial_strategies.
+
+get_rows_data(File, Lists):-
+  csv_read_file(File, Rows, []),
+  maplist(row_to_list, Rows, Lists).
+
+row_to_list(Row, List):-
+  Row =.. [row|List].
+
+preset:-
+  get_rows_data("./csvs/presets.csv", [_|T]),
+  add_preset(T).
+
+add_preset([]).
+
+add_preset([[Index,Name| Rest]|T]):-
+  assert(preset(Index, Name, Rest)),
+  add_preset(T).
 
 load_pokedex:-
   csv_read_file("./csvs/pokedex.csv", [_|R]),

@@ -2,6 +2,8 @@
 :- use_module(library(csv)).
 :- dynamic pokeDex/3. pokeDex(num,col, value).
 
+
+
 import:-load().
 load():-
   get_pokedex().

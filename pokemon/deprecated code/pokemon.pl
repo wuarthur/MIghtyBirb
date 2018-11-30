@@ -26,8 +26,6 @@ add_pokeDex(Col, [[Num|H]|T]):-
 recursive_dex(_,[],_).
 recursive_dex([],_, _).
 recursive_dex([C1|Ct], [Val|T],Num):-
-  %nl(),
-  %print(pokeDex(Num,C1, Val)),
   assert(pokeDex(Num,C1,Val)),
   recursive_dex(Ct,T, Num).
 
