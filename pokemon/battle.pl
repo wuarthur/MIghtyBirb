@@ -104,8 +104,10 @@ best_move(Att_idx, Def_idx, Move_indices, Best_move):-
 %Id3: winning pokemon id
 %Hp3: remainging hp after the fight
 fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3, V):-
-    Hp2 < 0 ->   print('1 won with: '), print(Hp1),nl(),Id3 is Id1,Hp3 is Hp1,V is 1, !;
-    Hp2 == 0 ->   print('1 won with: '), print(Hp1),nl(),Id3 is Id1,Hp3 is Hp1,V is 1, !;
+    active_pokemon(Id1,'pokemon_idx',Index2), getName(Index2, Name2), 
+    active_pokemon(Id2,'pokemon_idx',Index), getName(Index, Name), 
+    Hp2 < 0 ->   print(Name2),print('1 won with: '), print(Hp1), print(' HP'), nl(),Id3 is Id1,Hp3 is Hp1,V is 1, !;
+    Hp2 == 0 ->  print(Name2), print('1 won with: '), print(Hp1), print(' HP'),nl(),Id3 is Id1,Hp3 is Hp1,V is 1, !;
     getMove(Id2, Move2),
     getMove(Id1, Move1),
     active_pokemon(Id1,'pokemon_idx',Index),
@@ -119,7 +121,8 @@ fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3, V):-
     % print(New1),
     % nl(),
     New1 > 0 -> fight(Id1, New1 ,Id2, New2, Id3, Hp3 ,V );
-    print('2 won with: '),print(Hp2),nl(),Id3 is Id2,Hp3 is Hp2,V is 2.
+    print(Name),
+    print(' won with: '),print(Hp2), print(' HP'),nl(),Id3 is Id2,Hp3 is Hp2,V is 2.
     
 %print("recur1"), nl(), fight('f', 0 ,Id2, Hp2, Id3, Hp3, V);
 %pokemon 1v1
@@ -134,9 +137,10 @@ pvp(Id1, Id2, Winner):-
   active_pokemon(Id2, 'hp', HP2),
   fight(Id1, HP1, Id2, HP2, Wonner, HP, Won),
   pokemon(Wonner, 'name', Name),
-  Won == 2 -> retract(active_pokemon(Id1,_,_)), update_stat(Id2, 'hp',HP),Winner = Id2;
+  Won == 2 -> Diff is HP2 - HP, retract(active_pokemon(Id1,_,_)), update_stat(Id2, 'hp',Diff),Winner = Id2;
   retract(  (Id2,_,_)),
-  update_stat(Id1, 'hp',HP),
+  Diff is HP1 - HP,
+  update_stat(Id1, 'hp',Diff),
   Winner = Id1.
 
 getMove(Id, Move):-
