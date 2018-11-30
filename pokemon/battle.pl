@@ -141,9 +141,9 @@ pvp(Id1, Id2, Winner):-
   active_pokemon(Id2, 'hp', HP2),
   fight(Id1, HP1, Id2, HP2, Wonner, HP, Won),
   pokemon(Wonner, 'name', Name),
-  Won == 2 -> Diff is HP2 - HP, retract(active_pokemon(Id1,_,_)), update_stat(Id2, 'hp',Diff),Winner = Id2;
+  Won == 2 -> Diff is HP - HP2, retract(active_pokemon(Id1,_,_)), update_stat(Id2, 'hp',Diff),Winner = Id2;
   retract(  (Id2,_,_)),
-  Diff is HP1 - HP,
+  Diff is HP - HP1,
   update_stat(Id1, 'hp',Diff),
   Winner = Id1.
 
