@@ -1,5 +1,4 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- [game].
 
 % Calculate type multiplier against a pokemon
 % each pokemon has 1 or 2 types, which have a different multiplier value against a type
@@ -103,27 +102,27 @@ best_move(Att_idx, Def_idx, Move_indices, Best_move):-
 %Hp2: pokemon2's hp when fight begun
 %Id3: winning pokemon id
 %Hp3: remainging hp after the fight
-fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3, V):-
-    active_pokemon(Id1,'pokemon_idx',Index2), getName(Index2, Name2), 
-    active_pokemon(Id2,'pokemon_idx',Index), getName(Index, Name), 
-    Hp2 < 0 ->   print(Name2),print('1 won with: '), print(Hp1), print(' HP'), nl(),Id3 is Id1,Hp3 is Hp1,V is 1, !;
-    Hp2 == 0 ->  print(Name2), print('1 won with: '), print(Hp1), print(' HP'),nl(),Id3 is Id1,Hp3 is Hp1,V is 1, !;
-    getMove(Id2, Move2),
-    getMove(Id1, Move1),
-    active_pokemon(Id1,'pokemon_idx',Index),
-    active_pokemon(Id2,'pokemon_idx',Index2),
-    calculate_att(Index, Index2, Move2, Dmg1),
-    calculate_att(Index2, Index, Move1, Dmg2),
-    New1 is Hp1 - 10,
-    New2 is Hp2 - 20,
-    % print(Hp1),
-    % print(":"),
-    % print(New1),
-    % nl(),
-    New1 > 0 -> fight(Id1, New1 ,Id2, New2, Id3, Hp3 ,V );
-    print(Name),
-    print(' won with: '),print(Hp2), print(' HP'),nl(),Id3 is Id2,Hp3 is Hp2,V is 2.
-    
+% fight(Id1, Hp1 ,Id2, Hp2):-
+%     active_pokemon(Id1,'pokemon_idx',Index1), getName(Index1, Name1),
+%     active_pokemon(Id2,'pokemon_idx',Index2), getName(Index2, Name2),
+%     Hp2 < 0 ->   print(Name2),print('1 won with: '), print(Hp1), print(' HP'), nl(),Id3 is Id1,Hp3 is Hp1,V is 1, !;
+%     Hp2 == 0 ->  print(Name2), print('1 won with: '), print(Hp1), print(' HP'),nl(),Id3 is Id1,Hp3 is Hp1,V is 1, !;
+%     getMove(Id2, Move2),
+%     getMove(Id1, Move1),
+%     active_pokemon(Id1,'pokemon_idx',Index),
+%     active_pokemon(Id2,'pokemon_idx',Index2),
+%     calculate_att(Index, Index2, Move2, Dmg1),
+%     calculate_att(Index2, Index, Move1, Dmg2),
+%     New1 is Hp1 - 10,
+%     New2 is Hp2 - 20,
+%     % print(Hp1),
+%     % print(":"),
+%     % print(New1),
+%     % nl(),
+%     New1 > 0 -> fight(Id1, New1 ,Id2, New2, Id3, Hp3 ,V );
+%     print(Name),
+%     print(' won with: '),print(Hp2), print(' HP'),nl(),Id3 is Id2,Hp3 is Hp2,V is 2.
+
 %print("recur1"), nl(), fight('f', 0 ,Id2, Hp2, Id3, Hp3, V);
 %pokemon 1v1
 %Requires:
@@ -132,41 +131,94 @@ fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3, V):-
 %returns:
 %Active_pokemon id of winner
 
-pvp(Id1, Id2, Winner):-
-  active_pokemon(Id1, 'hp', HP1),
-  active_pokemon(Id2, 'hp', HP2),
-  fight(Id1, HP1, Id2, HP2, Wonner, HP, Won),
-  pokemon(Wonner, 'name', Name),
-  Won == 2 -> Diff is HP2 - HP, retract(active_pokemon(Id1,_,_)), update_stat(Id2, 'hp',Diff),Winner = Id2;
-  retract(  (Id2,_,_)),
-  Diff is HP1 - HP,
-  update_stat(Id1, 'hp',Diff),
-  Winner = Id1.
+pvp(MyId, FoeId):-
+  active_pokemon(MyId, 'pokemon_idx', MyPokeNo),
+  active_pokemon(FoeId, 'pokemon_idx', FoePokeNo),
+  pokemon(MyPokeNo, speed, MySpeed),
+  pokemon(FoePokeNo, speed, FoeSpeed),
+  nl(),print('In pvp'),nl(),
+  MySpeed >= FoeSpeed ->
+    print('I am faster'),
+    do_attack(false, MyPokeNo, FoePokeNo);
+  MySpeed < FoeSpeed ->
+    print('They are faster'),
+    do_attack(true, FoePokeNo, MyPokeNo)
+  .
+
+do_attack(Npc, AttackerId, DefenderId):-
+  active_pokemon(AttackerId, 'pokemon_idx', ANo),
+  active_pokemon(DefenderId, 'pokemon_idx', DNo),
+  getName(ANo, AName),
+  getName(DNo, DName),
+  active_pokemon(DefenderId, 'hp', DHp),
+  getMove(AttackerId, AMove),
+  get_move_name(AMove, AMoveName),
+  print(AMoveName),
+  nl(), write(AName), write(' used '), write(AMoveName),
+
+  calculate_att(ANo, DNo, AMove, Damage),
+  Damage >= DHp ->
+    fainted(Npc, DefenderId, AttackerId);
+  Damage < DHp ->
+    nl(),
+    Npc == true -> Next = false, write('The opponet\'s ');
+    Npc == false -> Next = true;
+    write(DName), write(' took '), write(Damage), write(' damage'),
+    update_stat(DefenderId, hp, Damage),
+    do_attack(Next, DefenderId, AttackerId)
+  .
+
+% Npc is true if fainted pokemon belongs to npc, false if it belongs to you
+fainted(Npc, FaintedPokemonId, AlivePokemonId):-
+  nl(),
+    Npc == true ->
+      write('The opponent\'s '),
+      active_pokemon(FaintedPokemonId, 'pokemon_idx', FaintedPokemonPokeNo),
+      getName(FaintedPokemonPokeNo, FaintedPokemonName),
+      write(FaintedPokemonName);
+    Npc == false ->
+      active_pokemon(AlivePokemonId, 'pokemon_idx', AlivePokeNo),
+      getName(AlivePokeNo, AliveName),
+      write(AliveName);
+  write(' has fainted.'),
+
+  retractall(active_pokemon(FaintedPokemonId,_,_)),
+
+  findall(I,active_pokemon(I,npc,Npc),Ids),
+  Ids == [] -> opponent_won(Npc);
+  active_pokemon(ReplacementPokemonId, npc, Npc),
+  active_pokemon(ReplacementPokemonId, 'pokemon_idx', ReplacementPokeNo), getName(ReplacementPokeNo, ReplacementName),
+  nl(),
+  Npc == true -> write('The opponent sent out ');
+  Npc == false -> write('Go! ');
+  write(ReplacementName),
+
+  Npc == true -> pvp(AlivePokemonId, ReplacementPokemonId);
+  Npc == false -> pvp(ReplacementPokemonId, AlivePokemonId)
+  .
+
+
+opponent_won(Npc):-
+  nl(),
+  Npc == true -> write('Opponent ');
+  Npc == false -> write('I ');
+  write(won).
+
+get_move_name(Id, Name):-
+  move(Id, move, Name).
 
 getMove(Id, Move):-
-  %pokemon(Pid, 'move', Move).
   random_move(Id, Move).
 
-battleTilDeath(Z):-
-  findall(I,active_pokemon(I,npc,false),MyIDs),
-  findall(I,active_pokemon(I,npc,true),EnemyIDs),
-  % print(MyIDs),
-  % print(":"),
-  % print(EnemyIDs),
-  MyIDs == [] -> Z = 'Enemy';
-  EnemyIDs == [] -> Z = 'Me';
-  nth0(0, MyIDs, MyPokeID),
-  nth0(0, EnemyIDs, EnemyPokeID),
-  pvp(MyPokeID, EnemyPokeID, Winner),
-  % print("yes:"),
-  % print(Winner),
-  % nl(),
-
-  findall(I,active_pokemon(I,npc,false),MyIDs),
-  findall(I,active_pokemon(I,npc,true),EnemyIDs),
-  % print(MyIDs),
-  % print(":"),
-  % print(EnemyIDs),
-  MyIDs == [] -> Z = 'Enemy';
-  EnemyIDs == [] -> Z = 'Me';
-  battleTilDeath(Z).
+battleTilDeath:-
+  active_pokemon(MyPokeID,npc,false),
+  active_pokemon(MyPokeID,pokemon_idx,MyPokeNo),
+  active_pokemon(EnemyPokeID,npc,true),
+  active_pokemon(EnemyPokeID,pokemon_idx,EnemyPokeNo),
+  getName(MyPokeNo, MyName),
+  getName(EnemyPokeNo, EnemyName),
+  write('Foe sent out '), write(EnemyName),
+  nl(),
+  write('Go! '), write(MyName),
+  pvp(MyPokeID, EnemyPokeID).
+  %battleTilDeath(Z).

@@ -1,7 +1,7 @@
 :- [utils].
 :- [kb].
 :- [team].
-% :- [battle].
+:- [battle].
 :- [userio].
 :- [script].
 
@@ -66,8 +66,8 @@ hp_status(Hp, 'Fainted'):-
 
 update_stat(Idx, Stat, Diff):-
   active_pokemon(Idx, Stat, Old_value),
-  New_value is Old_value + Diff,
-  retractall(active_pokemon(Idx, _, _)),
+  New_value is Old_value - Diff,
+  retractall(active_pokemon(Idx, Stat, _)),
   assertz(active_pokemon(Idx, Stat, New_value)).
 
 
