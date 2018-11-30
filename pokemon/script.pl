@@ -17,9 +17,9 @@ generate_full_team(random):-
   take(6, I, Indices),
   maplist(activate_my_pokemon, Indices),
   getPokemonNames(LN, Indices),
-  print("Your team:"),
+  write("Your team:"),
   nl(),
-  print(LN),
+  write(LN),
   generate_rival_team.
 
 generate_full_team(strategy):-
@@ -84,9 +84,9 @@ modify_strategy(done):-
   take(6, I, Indices),
   maplist(activate_my_pokemon, Indices),
   getPokemonNames(LN, Indices),
-  print("Your team:"),
+  write("Your team:"),
   nl(),
-  print(LN),
+  write(LN),
   generate_rival_team.
 
 
@@ -97,12 +97,25 @@ generate_rival_team:-
   take(6, I, Indices),
   maplist(activate_npc_pokemon, Indices),
   getPokemonNames(LN, Indices),
+  nl(),nl(),
+  write("Rival's team:"),
   nl(),
-  print("Rival's team:"),
+  write(LN),
+  begin_battle.
+
+begin_battle:-
+  nl(),nl(),nl(),nl(),
+  write('Someone wants to battle.'),
   nl(),
-  print(LN)
-  %TODO: add battle trigger here
-  .
+  %get name first pokemon of npc team,
+  write('Foe sent out '),
+  % write(name of first pokemon of npc team),
+  nl(),
+  % get name of our first pokemon
+  write('Go! '),
+  %write(name of our first pokemon),
+  nl().
+
 
 
 
