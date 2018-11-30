@@ -102,6 +102,7 @@ generate_rival_team:-
   write("Rival's team:"),
   nl(),
   write(LN),
+  retractall(last_q(_, _, _, _)),
   battleTilDeath.
 
 

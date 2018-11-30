@@ -69,7 +69,6 @@ calculate_att(Att_pokemon_idx, Def_pokemon_idx, Att_move_idx, Damage):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Pick a best move for active pokemon
-% NOTE: @yang yang i think this is used during the battle
 
 best_move(Att_idx, Def_idx, Move_indices, Best_move):-
   maplist(calculate_att(Att_idx, Def_idx), Move_indices, Damage_pts),
@@ -81,31 +80,18 @@ best_move(Att_idx, Def_idx, Move_indices, Best_move):-
 
 
 
-pvp(MyId, FoeId):-
-  active_pokemon(MyId, 'pokemon_idx', MyPokeNo),
-  active_pokemon(FoeId, 'pokemon_idx', FoePokeNo),
-  pokemon(MyPokeNo, speed, MySpeed),
-  pokemon(FoePokeNo, speed, FoeSpeed),
-  I is MySpeed - FoeSpeed,
-  who_goes_first(I, MyId, FoeId).
-
-who_goes_first(N, MyId, FoeId):-
-  N >= 0,
-  do_attack(false, MyId, FoeId).
-who_goes_first(N, MyId, FoeId):-
-  N < 0,
-  do_attack(true, MyId, FoeId).
 
 
-do_attack(Npc, AttackerId, DefenderId):-
+
+
+pvp(Npc, AttackerId, DefenderId):-
   active_pokemon(AttackerId, 'pokemon_idx', ANo),
   active_pokemon(DefenderId, 'pokemon_idx', DNo),
   getName(ANo, AName),
   active_pokemon(DefenderId, 'hp', DHp),
   getMove(AttackerId, AMove),
   get_move_name(AMove, AMoveName),
-  not_npc(Npc,NotNpc),
-  nl(),append_opponents(NotNpc), write(AName), write(' used '), write(AMoveName),
+  nl(),append_opponents(Npc), write(AName), write(' used '), write(AMoveName),
   calculate_att(ANo, DNo, AMove, Damage),
   Value is DHp - Damage,
   check_hp(Value, Npc, DefenderId, AttackerId, Damage).
@@ -113,17 +99,20 @@ do_attack(Npc, AttackerId, DefenderId):-
 
 check_hp(Value, Npc, DefenderId, AttackerId, _):-
   Value < 0,
-  fainted(Npc, DefenderId, AttackerId).
+  %next turn
+  not_npc(Npc,NotNpc),
+  fainted(NotNpc, DefenderId, AttackerId).
 
 check_hp(Value, Npc, DefenderId, AttackerId, Damage):-
   Value >= 0,
   active_pokemon(DefenderId, 'pokemon_idx', DNo),
   active_pokemon(DefenderId, 'hp', DHp),
   getName(DNo, DName),
-  nl(), append_opponents(Npc), write(DName), write(' has '), write(DHp), write(' hp left'),
-  update_stat(DefenderId, hp, Damage),
+  %next turn
   not_npc(Npc,NotNpc),
-  do_attack(NotNpc, DefenderId, AttackerId).
+  nl(), append_opponents(NotNpc), write(DName), write(' has '), write(DHp), write(' hp left'),
+  update_stat(DefenderId, hp, Damage),
+  pvp(NotNpc, DefenderId, AttackerId).
 
 
 % Npc is true if fainted pokemon belongs to npc, false if it belongs to you
@@ -143,6 +132,7 @@ fainted(Npc, FaintedPokemonId, AlivePokemonId):-
   write(' has fainted.'),
   retractall(active_pokemon(FaintedPokemonId,_,_)),
   findall(I,active_pokemon(I,npc,Npc),Ids),
+  print(Ids),
   length(Ids, L),
   check_for_remaining_pokemon(L, AlivePokemonId, Npc).
 
@@ -151,18 +141,19 @@ check_for_remaining_pokemon(0, _, Npc):-
 check_for_remaining_pokemon(N, AlivePokemonId, Npc):-
   N > 0,
   active_pokemon(ReplacementPokemonId, npc, Npc),
+  forall(active_pokemon(Value2, npc, Npc),(ReplacementPokemonId>Value2->fail;true)),
   trigger_next_match(Npc, ReplacementPokemonId, AlivePokemonId).
 
-trigger_next_match(true, ReplacementPokemonId, AlivePokemonId):-
-  active_pokemon(ReplacementPokemonId, 'pokemon_idx', PokeNo),
-  getName(PokeNo, PokeName),
-  nl(),nl(),write('\t\t\tThe opponent sent out '), write(PokeName),
-  pvp(AlivePokemonId, ReplacementPokemonId).
 trigger_next_match(false, ReplacementPokemonId, AlivePokemonId):-
   active_pokemon(ReplacementPokemonId, 'pokemon_idx', PokeNo),
   getName(PokeNo, PokeName),
   nl(),nl(),write('Go! '), write(PokeName),
-  pvp(ReplacementPokemonId, AlivePokemonId).
+  pvp(true, AlivePokemonId, ReplacementPokemonId).
+trigger_next_match(true, ReplacementPokemonId, AlivePokemonId):-
+  active_pokemon(ReplacementPokemonId, 'pokemon_idx', PokeNo),
+  getName(PokeNo, PokeName),
+  nl(),nl(),write('\t\t\tThe opponent sent out '), write(PokeName),
+  pvp(false, AlivePokemonId, ReplacementPokemonId).
 
 i_won(false):-
   nl(), write('\t\t\tOpponent has won').
@@ -182,7 +173,7 @@ battleTilDeath:-
   active_pokemon(EnemyPokeID, 'pokemon_idx', FoePokeNo),
   getName(MyPokeNo, MyPokeName),
   getName(FoePokeNo, FoeName),
-  nl(),nl(),write('The opponent sent out '), write(FoeName),
+  nl(),nl(),write('\t\t\tThe opponent sent out '), write(FoeName),
   nl(),write('Go! '), write(MyPokeName),
   nl(),
-  pvp(MyPokeID, EnemyPokeID).
+  pvp(false, MyPokeID, EnemyPokeID).
