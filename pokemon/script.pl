@@ -1,4 +1,5 @@
 start:-
+  retractall(last_q(_, _, _, _)),
   retractall(active_pokemon(_,_,_)),
   ask_user(
     'Welcome to the pokemon battling lite.\n
@@ -101,20 +102,7 @@ generate_rival_team:-
   write("Rival's team:"),
   nl(),
   write(LN),
-  begin_battle.
-
-begin_battle:-
-  nl(),nl(),nl(),nl(),
-  write('Someone wants to battle.'),
-  nl(),
-  %get name first pokemon of npc team,
-  write('Foe sent out '),
-  % write(name of first pokemon of npc team),
-  nl(),
-  % get name of our first pokemon
-  write('Go! '),
-  %write(name of our first pokemon),
-  nl().
+  battleTilDeath.
 
 
 
