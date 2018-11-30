@@ -95,26 +95,8 @@ best_move(Att_idx, Def_idx, Move_indices, Best_move):-
 % @yang yang, the pokemon with the higher speed goes first
 % random if the speed is the same
 
-pokemonState(Id, Hp).
 
 
-
-fight('f', _ ,Id2, Hp2, Id3, Hp3,V):-
-  print('2 won'),
-  nl(),
-  Id3 is Id2,
-  Hp3 is Hp2,
-  V is 2.
-
-fight(Id1, Hp1 ,Id2, 0, Id3, Hp3,V):-
-  print('1 won'),
-  nl(),
-  Id3 is Id1,
-  Hp3 is Hp1,
-  V is 1.
-
-
-  
 %Id1: pokemon1 id
 %Hp1: pokemon1's hp when fight begun
 %Id2: other pokemon2 id
@@ -122,18 +104,22 @@ fight(Id1, Hp1 ,Id2, 0, Id3, Hp3,V):-
 %Id3: winning pokemon id
 %Hp3: remainging hp after the fight
 fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3, V):-
-    Hp2 < 0 ->
-    fight(Id1, Hp1 ,_, 0, Id3, Hp3, V);
+    Hp2 < 0 ->   print('2 won with: '), print(Hp2),nl(),Id3 is Id2,Hp3 is Hp2,V is 2, !;
+    Hp2 == 0 ->   print('2 won with: '), print(Hp2),nl(),Id3 is Id2,Hp3 is Hp2,V is 2, !;
     getMove(Id2, Move2),
-    calculate_att(9, 1, Move2, Dmg1),
-    New1 is Hp1 - Dmg1,
-    New1 > 0 ->
-      getMove(Id1, Move1),
-    calculate_att(9, 1, Move1, Dmg2),
-      New2 is Hp2 - Dmg2,
-      fight(Id1, New1 ,Id2, New2, Id3, Hp3 ,V );
-    fight('f', _ ,Id2, Hp2, Id3, Hp3, V).
-
+    getMove(Id1, Move1),
+    % calculate_att(9, 1, Move2, Dmg1),
+    % calculate_att(6, 1, Move1, Dmg2),
+    New1 is Hp1 - 10,
+    New2 is Hp2 - 20,
+    print(Hp1),
+    print(":"),
+    print(New1),
+    nl(),
+    New1 > 0 -> fight(Id1, New1 ,Id2, New2, Id3, Hp3 ,V );
+    print('1 won with: '),print(Hp1),nl(),Id3 is Id1,Hp3 is Hp1,V is 1.
+    
+%print("recur1"), nl(), fight('f', 0 ,Id2, Hp2, Id3, Hp3, V);
 %pokemon 1v1
 %Requires:
 %Active_pokemon ids
@@ -141,17 +127,31 @@ fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3, V):-
 %returns:
 %Active_pokemon id of winner
 
-pvp(Id1, Id2, P1, P2, Winner):-
+pvp(Id1, Id2, Winner):-
   active_pokemon(Id1, 'hp', HP1),
   active_pokemon(Id2, 'hp', HP2),
-  fight(P1, HP1, P2, HP2, Wonner, HP, Won),
+  fight(Id1, HP1, Id2, HP2, Wonner, HP, Won),
   pokemon(Wonner, 'name', Name),
   print("Winner is "),
   print(Won),
   Won == 2 -> retract(active_pokemon(Id1,_,_)), update_stat(Id2, 'hp',HP),Winner = Id2;
-  retract(active_pokemon(Id2,_,_)),
+  retract(  (Id2,_,_)),
   update_stat(Id1, 'hp',HP),
   Winner = Id1.
 
-getMove(Pid, Move):-
-  pokemon(Pid, 'move', Move).
+getMove(Id, Move):-
+  %pokemon(Pid, 'move', Move).
+  random_move(Id, Move).
+
+battleTilDeath(Z):-
+  findall(I,active_pokemon(I,npc,false),MyIDs),
+  findall(I,active_pokemon(I,npc,true),EnemyIDs),
+  MyIDs == [] -> Z = 'Enemy';
+  EnemyIDs == [] -> Z = 'Me';
+  nth0(0, MyIDs, MyPokeID),
+  nth0(0, EnemyIDs, EnemyPokeID),
+  pvp(Id1, Id2, Winner),
+  print("yes:"),
+  print(Winner),
+  Z = 12.
+  %battleTilDeath(Z).

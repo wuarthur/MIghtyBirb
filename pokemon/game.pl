@@ -78,6 +78,18 @@ update_stat(Idx, Stat, Diff):-
 %%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%YI"S PERONAL SPACE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+default_moves(Idx, Move_indices):-
+  findall(M, pokemon(Idx, 'move', M), Move_indices).
+
+
+% Pick a random move for active pokemon
+
+random_move(Id, Move):-
+  active_pokemon(Id, 'moves', Move_indices),
+  random_permutation(Move_indices, Moves),
+  Moves = [Move|_ ].
+
+
 
 
 
