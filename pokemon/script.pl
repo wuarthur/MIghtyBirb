@@ -21,7 +21,7 @@ generate_full_team(random):-
   write("Your team:"),
   nl(),
   write(LN),
-  generate_rival_team.
+  fight_leader('Cynthia').
 
 generate_full_team(strategy):-
   strategy_parameters('type',Type),
@@ -104,6 +104,22 @@ generate_rival_team:-
   write(LN),
   retractall(last_q(_, _, _, _)),
   battleTilDeath.
+
+fight_leader(Leader):-
+  preset(_,Leader, I),
+  % list_to_set(ListOfPokemon, Found_set),
+  % random_permutation(Found_set, I),
+  take(6, I, Indices),
+  maplist(activate_npc_pokemon, Indices),
+  getPokemonNames(LN, Indices),
+  nl(),nl(),
+  write("Rival's team:"),
+  nl(),
+  write(LN),
+  retractall(last_q(_, _, _, _)),
+  battleTilDeath.
+
+
 
 
 
