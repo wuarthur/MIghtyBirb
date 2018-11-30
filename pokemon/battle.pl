@@ -108,8 +108,10 @@ fight(Id1, Hp1 ,Id2, Hp2, Id3, Hp3, V):-
     Hp2 == 0 ->   print('1 won with: '), print(Hp1),nl(),Id3 is Id1,Hp3 is Hp1,V is 1, !;
     getMove(Id2, Move2),
     getMove(Id1, Move1),
-    % calculate_att(9, 1, Move2, Dmg1),
-    % calculate_att(6, 1, Move1, Dmg2),
+    active_pokemon(Id1,'pokemon_idx',Index),
+    active_pokemon(Id2,'pokemon_idx',Index2),
+    calculate_att(Index, Index2, Move2, Dmg1),
+    calculate_att(Index2, Index, Move1, Dmg2),
     New1 is Hp1 - 10,
     New2 is Hp2 - 20,
     % print(Hp1),
